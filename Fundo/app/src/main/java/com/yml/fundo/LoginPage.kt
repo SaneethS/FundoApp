@@ -12,6 +12,4 @@ class LoginPage:Fragment(R.layout.login_page) {
         super.onViewCreated(view, savedInstanceState)
         binding = LoginPageBinding.bind(view)
     }
-
-
 }
