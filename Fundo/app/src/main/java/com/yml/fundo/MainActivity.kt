@@ -26,10 +26,6 @@ class MainActivity : AppCompatActivity() {
                 binding.askText.setText(R.string.don_t_have_account)
                 binding.registerLink.setText(R.string.register)
             }
-//            binding.registerLink.setOnClickListener {
-//                val intent = Intent(this,MainActivity::class.java)
-//                startActivity(intent)
-//            }
         }
     }
 
