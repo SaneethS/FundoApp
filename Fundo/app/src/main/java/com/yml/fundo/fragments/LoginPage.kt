@@ -28,14 +28,12 @@ class LoginPage:Fragment(R.layout.login_page) {
             var password = binding.passwordField
             if(Validator.loginValidation(email,password)){
                 Authentication.loginEmailPassword(email.text.toString(),password.text.toString()){
-                    if(it == null){
-                        Toast.makeText(requireContext(),"Log-in Failed",Toast.LENGTH_LONG)
-                    }else{
+                    if(it != null){
                         Toast.makeText(requireContext(),"Log-in Successful",Toast.LENGTH_LONG)
                         requireActivity().supportFragmentManager.beginTransaction().apply {
                             replace(R.id.fragment_view,HomePage())
                             commit()
-                        }
+                         }
                     }
                 }
             }
