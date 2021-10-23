@@ -13,6 +13,10 @@ class HomePage:Fragment(R.layout.home_page) {
         super.onViewCreated(view, savedInstanceState)
         binding = HomePageBinding.bind(view)
 
+        var name = arguments?.get("name").toString()
+
+        binding.welcomeText.text = "Welcome $name!!"
+
         binding.button.setOnClickListener {
             Authentication.logOut()
             requireActivity().supportFragmentManager.beginTransaction().apply {

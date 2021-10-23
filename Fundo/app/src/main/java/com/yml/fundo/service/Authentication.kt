@@ -11,32 +11,35 @@ object Authentication {
 
     fun getCurrentUser() = fauth.currentUser
 
-    fun registerEmailPassword(email: String, password:String, callback: (FirebaseUser?) -> Unit){
+    fun registerEmailPassword(email: String, password:String, callback: (Boolean,FirebaseUser?) -> Unit){
+        if(getCurrentUser() != null){
+            callback(true,getCurrentUser())
+        }
         fauth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.i("Authenticate","Sign up Successful")
-                callback(getCurrentUser())
+                callback(true,getCurrentUser())
             }else{
                 Log.i("Authenticate","Sign up failed")
                 Log.i("Authenticate",it.exception.toString())
-                callback(null)
+                callback(false, null)
             }
         }
     }
 
-    fun loginEmailPassword(email: String, password: String,callback: (FirebaseUser?) -> Unit){
+    fun loginEmailPassword(email: String, password: String,callback: (Boolean,FirebaseUser?) -> Unit){
+
         fauth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.i("Authenticate","Sign in Successful")
-                callback(getCurrentUser())
+                callback(true,getCurrentUser())
             }else{
                 Log.i("Authenticate","Sign in failed")
                 Log.i("Authenticate",it.exception.toString())
-                callback(null)
+                callback(false, null)
             }
         }
     }
-
 
     fun logOut() = fauth.signOut()
 
