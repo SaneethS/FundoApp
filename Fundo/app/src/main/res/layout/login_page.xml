@@ -86,6 +86,22 @@
             android:textStyle="bold"></TextView>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/orText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Or"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="180dp"/>
 
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebookLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp" />
 
 </LinearLayout>

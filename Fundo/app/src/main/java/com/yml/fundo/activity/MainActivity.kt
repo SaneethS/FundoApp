@@ -7,6 +7,7 @@ import com.yml.fundo.R
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.fragments.HomePage
 import com.yml.fundo.fragments.LoginPage
+import com.yml.fundo.fragments.SplashScreen
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.Database
 
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         checkUserLogin()
         switchFragment(LoginPage())
 

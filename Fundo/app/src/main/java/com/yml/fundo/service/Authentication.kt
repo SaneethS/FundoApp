@@ -1,10 +1,13 @@
 package com.yml.fundo.service
 
 import android.util.Log
+import com.facebook.AccessToken
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.yml.fundo.model.User
 
 object Authentication {
     private var fauth:FirebaseAuth = Firebase.auth
@@ -37,6 +40,23 @@ object Authentication {
                 Log.i("Authenticate","Sign in failed")
                 Log.i("Authenticate",it.exception.toString())
                 callback(false, null)
+            }
+        }
+    }
+
+    fun signInWithFacebook(accessToken: AccessToken, callback: (FirebaseUser?) -> Unit){
+        var credentials = FacebookAuthProvider.getCredential(accessToken.token)
+        fauth.signInWithCredential(credentials).addOnCompleteListener {
+            if(it.isSuccessful){
+                var fbUser = getCurrentUser()
+                var name = fbUser?.displayName.toString()
+                var email = fbUser?.email.toString()
+                var mobileNo = fbUser?.phoneNumber.toString()
+                var user = User(name,email,mobileNo)
+                Database.setToDatabase(user){}
+                callback(getCurrentUser())
+            }else{
+                callback(null)
             }
         }
     }
