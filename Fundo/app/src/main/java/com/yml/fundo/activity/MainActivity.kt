@@ -18,9 +18,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        checkUserLogin()
-        switchFragment(LoginPage())
+        switchFragment(SplashScreen())
+//        checkUserLogin()
+//        switchFragment(LoginPage())
 
     }
 
@@ -31,18 +31,6 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.commit()
     }
 
-    fun checkUserLogin(){
-        val user = Authentication.getCurrentUser()
-        if(user!=null){
-            Database.getFromDatabase(user.uid){status, bundle->
-                var home = HomePage()
-                home.arguments = bundle
-                supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_view, HomePage())
-                    commit()
-                }
-            }
-        }
-    }
+
 
 }

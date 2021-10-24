@@ -1,5 +1,6 @@
 package com.yml.fundo.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -45,6 +46,7 @@ class LoginPage:Fragment(R.layout.login_page) {
             loading.show()
             facbookLogin()
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -79,7 +81,7 @@ class LoginPage:Fragment(R.layout.login_page) {
                                 home.arguments = bundle
                                 loading.dismiss()
                                 requireActivity().supportFragmentManager.beginTransaction().apply {
-                                    replace(R.id.fragment_view,HomePage())
+                                    replace(R.id.fragment_view,home)
                                     commit()
                                 }
                             }else{
@@ -107,7 +109,7 @@ class LoginPage:Fragment(R.layout.login_page) {
                             home.arguments = bundle
                             loading.dismiss()
                             requireActivity().supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fragment_view,HomePage())
+                                replace(R.id.fragment_view,home)
                                 commit()
                             }
                         }else{

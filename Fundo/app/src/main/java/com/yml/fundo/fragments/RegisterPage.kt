@@ -61,7 +61,7 @@ class RegisterPage: Fragment(R.layout.register_page) {
                             home.arguments = bundle
                             loading.dismiss()
                             requireActivity().supportFragmentManager.beginTransaction().apply {
-                                replace(R.id.fragment_view,HomePage())
+                                replace(R.id.fragment_view,home)
                                 commit()
                             }
                         }
