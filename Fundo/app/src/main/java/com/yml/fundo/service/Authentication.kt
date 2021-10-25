@@ -2,6 +2,7 @@ package com.yml.fundo.service
 
 import android.util.Log
 import com.facebook.AccessToken
+import com.facebook.login.LoginManager
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -61,6 +62,19 @@ object Authentication {
         }
     }
 
-    fun logOut() = fauth.signOut()
+    fun resetPassword(email:String, callback: (String)-> Unit){
+        fauth.sendPasswordResetEmail(email).addOnCompleteListener {
+            if(it.isSuccessful){
+                callback("Password reset sent to $email")
+            }else{
+                callback("Email not found!!")
+            }
+        }
+    }
+
+    fun logOut() {
+        LoginManager.getInstance().logOut()
+        fauth.signOut()
+    }
 
 }

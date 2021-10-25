@@ -47,6 +47,10 @@ class LoginPage:Fragment(R.layout.login_page) {
             facbookLogin()
         }
 
+        binding.forgotPasswordLink.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_view,ResetPassword()).commit()
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

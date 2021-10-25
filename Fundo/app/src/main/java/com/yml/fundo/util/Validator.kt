@@ -54,6 +54,15 @@ object Validator {
         return status
     }
 
+    fun forgotPasswordValidator(email: TextInputEditText):Boolean{
+        var status:Boolean = true
+        if(validateEmail(email.text.toString())){
+            email.setError("Enter valid Email")
+            status = false
+        }
+        return status
+    }
+
     fun validateName(name: String) = !name.isNotEmpty()
     fun validateEmail(email: String) = !Patterns.EMAIL_ADDRESS.matcher(email).matches()
     fun validateMobileNo(mobileNo: String) = !Patterns.PHONE.matcher(mobileNo).matches()
