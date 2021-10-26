@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.fragments.*
-import com.yml.fundo.fragments.RegisterPage.Companion.loading
+import com.yml.fundo.model.UserDetails
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.Database
 import com.yml.fundo.util.Util
@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         observeNavigation()
         sharedViewModel.setGoToSplashScreenStatus(true)
         loginObserver()
+        registerObserver()
         resetPasswordObserver()
 
     }
@@ -106,13 +107,37 @@ class MainActivity : AppCompatActivity() {
             if(it?.loginStatus == true){
                 LoginPage.loading.dismiss()
                 Database.getFromDatabase{
-
+                    var userDetails = Util.createUser(it)
+                    Toast.makeText(this,userDetails.toString(),Toast.LENGTH_LONG).show()
                 }
                 sharedViewModel.setGoToHomePageStatus(true)
 
             }else{
                 LoginPage.loading.dismiss()
                 Toast.makeText(this,"Facebook Log-in failed", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    fun registerObserver(){
+        sharedViewModel.registerStatus.observe(this@MainActivity){
+            var name = RegisterPage.binding.registerName
+            var email = RegisterPage.binding.registerEmail
+            var mobileNO = RegisterPage.binding.registerMobile
+            val userDetails = UserDetails(name.text.toString(),email.text.toString(),mobileNO.text.toString())
+            if(it?.loginStatus == true){
+                RegisterPage.loading.dismiss()
+                Database.setToDatabase(userDetails){
+                    if(!it){
+                        RegisterPage.loading.dismiss()
+                        Toast.makeText(this,"Something went wrong",Toast.LENGTH_LONG)
+                    }else{
+                        sharedViewModel.setGoToHomePageStatus(true)
+                    }
+                }
+            }else{
+                RegisterPage.loading.dismiss()
+                Toast.makeText(this,"Sign up unsuccessful",Toast.LENGTH_LONG).show()
             }
         }
     }

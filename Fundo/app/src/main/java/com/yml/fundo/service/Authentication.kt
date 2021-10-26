@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.yml.fundo.model.User
+import com.yml.fundo.model.UserDetails
 
 object Authentication {
     private var fauth:FirebaseAuth = Firebase.auth
@@ -61,7 +62,8 @@ object Authentication {
                 var email = fbUser?.email.toString()
                 var mobileNo = fbUser?.phoneNumber.toString()
                 user = User(name,email,mobileNo,true)
-                Database.setToDatabase(user!!){}
+                val userDetails = UserDetails(name, email, mobileNo)
+                Database.setToDatabase(userDetails!!){}
                 callback(user)
             }else{
                 user = User("","","",false)
