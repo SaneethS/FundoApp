@@ -1,3 +1,5 @@
 package com.yml.fundo.model
 
-data class User(val name: String,val email:String,val mobileNo:String)
+import com.yml.fundo.service.Authentication
+
+data class User(var name: String,var email:String,var mobileNo:String, var loginStatus:Boolean = Authentication.getCurrentUser() != null)

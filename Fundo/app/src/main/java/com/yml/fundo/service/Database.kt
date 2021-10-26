@@ -23,18 +23,14 @@ object Database {
         }
     }
 
-    fun getFromDatabase(uid:String, callback: (Boolean,Bundle?) -> Unit){
-        var bundle:Bundle = Bundle()
-        var result: DataSnapshot
-        database.child("users").child(uid).get().addOnCompleteListener {
-            if(it.isSuccessful){
-                result = it.result!!
-                bundle.putString("name",result.child("name").value.toString())
-                bundle.putString("email",result.child("email").value.toString())
-                bundle.putString("mobileNo",result.child("mobileNo").value.toString())
-                callback(true,bundle)
+    fun getFromDatabase(callback: (HashMap<*,*>) -> Unit){
+        database.child("users").child(Authentication.getCurrentUser()?.uid.toString()).get().addOnCompleteListener {status ->
+            if(!status.isSuccessful){
+
             }else{
-                callback(false,null)
+                status.result.also {
+                    callback(it?.value as HashMap<*, *>)
+                }
             }
 
         }

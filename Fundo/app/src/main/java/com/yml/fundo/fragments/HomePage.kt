@@ -18,7 +18,7 @@ import com.yml.fundo.viewmodel.SharedViewModelFactory
 class HomePage:Fragment(R.layout.home_page) {
     lateinit var binding: HomePageBinding
     lateinit var sharedViewModel: SharedViewModel
-    
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = HomePageBinding.bind(view)

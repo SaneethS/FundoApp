@@ -24,14 +24,12 @@ class SplashScreen:Fragment(R.layout.splash_screen) {
         binding.splashImage.alpha = 0f
         binding.splashImage.animate().setDuration(1500).alpha(1f).withEndAction {
             val user = Authentication.getCurrentUser()
-            if (user != null) {
-                Database.getFromDatabase(user.uid) { status, bundle ->
-//                    var home = HomePage()
-//                    home.arguments = bundle
-                    sharedViewModel.setGoToHomePageStatus(true)
-                }
-            } else {
+            if (user == null) {
                 sharedViewModel.setGoToLoginPageStatus(true)
+            } else {
+                Database.getFromDatabase {
+                }
+                sharedViewModel.setGoToHomePageStatus(true)
             }
         }
     }

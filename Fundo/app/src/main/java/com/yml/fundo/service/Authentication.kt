@@ -15,48 +15,56 @@ object Authentication {
 
     fun getCurrentUser() = fauth.currentUser
 
-    fun registerEmailPassword(email: String, password:String, callback: (Boolean,FirebaseUser?) -> Unit){
+    fun registerEmailPassword(email: String, password:String, callback: (User?) -> Unit){
+        var user:User? = null
         if(getCurrentUser() != null){
-            callback(true,getCurrentUser())
+            user = User(getCurrentUser()?.displayName.toString(), getCurrentUser()?.email.toString(), getCurrentUser()?.phoneNumber.toString(), true)
+            callback(user)
         }
         fauth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.i("Authenticate","Sign up Successful")
-                callback(true,getCurrentUser())
+                user = User(getCurrentUser()?.displayName.toString(), getCurrentUser()?.email.toString(), getCurrentUser()?.phoneNumber.toString(), true)
+                callback(user)
             }else{
                 Log.i("Authenticate","Sign up failed")
                 Log.i("Authenticate",it.exception.toString())
-                callback(false, null)
+                user = User("", "", "", false)
+                callback(user)
             }
         }
     }
 
-    fun loginEmailPassword(email: String, password: String,callback: (Boolean,FirebaseUser?) -> Unit){
-
+    fun loginEmailPassword(email: String, password: String,callback: (User?) -> Unit){
+        var user:User? = null
         fauth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.i("Authenticate","Sign in Successful")
-                callback(true,getCurrentUser())
+                user = User(getCurrentUser()?.displayName.toString(), getCurrentUser()?.email.toString(), getCurrentUser()?.phoneNumber.toString(), true)
+                callback(user)
             }else{
                 Log.i("Authenticate","Sign in failed")
                 Log.i("Authenticate",it.exception.toString())
-                callback(false, null)
+                user = User("", "", "", false)
+                callback(user)
             }
         }
     }
 
-    fun signInWithFacebook(accessToken: AccessToken, callback: (FirebaseUser?) -> Unit){
+    fun signInWithFacebook(accessToken: AccessToken, callback: (User?) -> Unit){
         var credentials = FacebookAuthProvider.getCredential(accessToken.token)
+        var user:User? = null
         fauth.signInWithCredential(credentials).addOnCompleteListener {
             if(it.isSuccessful){
                 var fbUser = getCurrentUser()
                 var name = fbUser?.displayName.toString()
                 var email = fbUser?.email.toString()
                 var mobileNo = fbUser?.phoneNumber.toString()
-                var user = User(name,email,mobileNo)
-                Database.setToDatabase(user){}
-                callback(getCurrentUser())
+                user = User(name,email,mobileNo,true)
+                Database.setToDatabase(user!!){}
+                callback(user)
             }else{
+                user = User("","","",false)
                 callback(null)
             }
         }

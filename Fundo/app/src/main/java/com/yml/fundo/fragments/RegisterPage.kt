@@ -18,8 +18,11 @@ import com.yml.fundo.viewmodel.SharedViewModelFactory
 
 class RegisterPage: Fragment(R.layout.register_page) {
     lateinit var binding: RegisterPageBinding
-    lateinit var loading: Dialog
     lateinit var sharedViewModel: SharedViewModel
+
+    companion object{
+        lateinit var loading: Dialog
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,6 +39,27 @@ class RegisterPage: Fragment(R.layout.register_page) {
             loading.show()
             register()
         }
+
+        sharedViewModel.registerStatus.observe(viewLifecycleOwner){
+            var name = binding.registerName
+            var email = binding.registerEmail
+            var mobileNO = binding.registerMobile
+            val user = User(name.text.toString(),email.text.toString(),mobileNO.text.toString())
+            if(it?.loginStatus == true){
+                loading.dismiss()
+                Database.setToDatabase(user){
+                    if(!it){
+                        loading.dismiss()
+                        Toast.makeText(requireContext(),"Something went wrong",Toast.LENGTH_LONG)
+                    }else{
+                        sharedViewModel.setGoToHomePageStatus(true)
+                    }
+                }
+            }else{
+                loading.dismiss()
+                Toast.makeText(requireContext(),"Sign up unsuccessful",Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun register() {
@@ -44,29 +68,9 @@ class RegisterPage: Fragment(R.layout.register_page) {
         var password = binding.registerPassword
         var confirmPassword = binding.registerConfirmPassword
         var mobileNO = binding.registerMobile
-        var bundle: Bundle
 
         if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO)){
-            val user = User(name.text.toString(),email.text.toString(),mobileNO.text.toString())
-            Authentication.registerEmailPassword(email.text.toString(),password.text.toString()){status,firebaseUser ->
-                if(!status){
-                    loading.dismiss()
-                    Toast.makeText(requireContext(),"Sign in unsuccessful",Toast.LENGTH_LONG).show()
-                }else{
-                    Database.setToDatabase(user){
-                        if(!it){
-                            loading.dismiss()
-                            Toast.makeText(requireContext(),"Something went wrong",Toast.LENGTH_LONG)
-                        }else{
-                            bundle = Util.createUser(user)
-                            var home = HomePage()
-                            home.arguments = bundle
-                            loading.dismiss()
-                            sharedViewModel.setGoToHomePageStatus(true)
-                        }
-                    }
-                }
-            }
+            sharedViewModel.registerNewUser(email.text.toString(), password.text.toString())
         }
     }
 }

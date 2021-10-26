@@ -15,17 +15,21 @@ import com.yml.fundo.viewmodel.SharedViewModelFactory
 
 class ResetPassword: Fragment(R.layout.reset_password) {
     lateinit var binding: ResetPasswordBinding
-    lateinit var dialog: Dialog
     lateinit var sharedViewModel: SharedViewModel
+
+    companion object{
+        lateinit var loading: Dialog
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = ResetPasswordBinding.bind(view)
-        dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.loading_screen)
+        loading = Dialog(requireContext())
+        loading.setContentView(R.layout.loading_screen)
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory())[SharedViewModel::class.java]
 
         binding.resetButton.setOnClickListener {
+            loading.show()
             resetPassword(binding.resetEmail.text.toString())
         }
 
@@ -36,12 +40,8 @@ class ResetPassword: Fragment(R.layout.reset_password) {
 
     fun resetPassword(email: String){
         if(Validator.forgotPasswordValidator(binding.resetEmail)){
-            dialog.show()
-            Authentication.resetPassword(email){
-                Toast.makeText(requireContext(),it,Toast.LENGTH_LONG).show()
-                sharedViewModel.setGoToLoginPageStatus(true)
-                dialog.dismiss()
-            }
+            sharedViewModel.resetPasswordOfUser(email)
+
         }
     }
 }

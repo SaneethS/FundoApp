@@ -23,9 +23,12 @@ import com.yml.fundo.viewmodel.SharedViewModelFactory
 
 class LoginPage:Fragment(R.layout.login_page) {
     lateinit var binding:LoginPageBinding
-    lateinit var loading:Dialog
     lateinit var callbackManager: CallbackManager
     lateinit var sharedViewModel: SharedViewModel
+
+    companion object{
+        lateinit var loading:Dialog
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,7 +56,11 @@ class LoginPage:Fragment(R.layout.login_page) {
             sharedViewModel.setGoToResetPasswordStatus(true)
         }
 
+
     }
+
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -76,24 +83,8 @@ class LoginPage:Fragment(R.layout.login_page) {
             }
 
             override fun onSuccess(result: LoginResult) {
-                Authentication.signInWithFacebook(result.accessToken){user ->
-                    if(user == null){
-                        Toast.makeText(requireContext(),"Facebook Log-in failed",Toast.LENGTH_LONG).show()
-                    }else{
-                        Database.getFromDatabase(user.uid){ status,bundle ->
-                            if(status){
-                                Toast.makeText(requireContext(),"Log-in Successful",Toast.LENGTH_LONG).show()
-//                                var home = HomePage()
-//                                home.arguments = bundle
-                                loading.dismiss()
-                                sharedViewModel.setGoToHomePageStatus(true)
-                            }else{
-                                loading.dismiss()
-                                Toast.makeText(requireContext(),"read failed",Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
-                }
+                sharedViewModel.facebookLoginWithUser(result.accessToken)
+
             }
 
         })
@@ -103,26 +94,8 @@ class LoginPage:Fragment(R.layout.login_page) {
         var email = binding.usernameField
         var password = binding.passwordField
         if(Validator.loginValidation(email,password)){
-            Authentication.loginEmailPassword(email.text.toString(),password.text.toString()){status,user ->
-                if(status){
-                    Database.getFromDatabase(user!!.uid){status,bundle ->
-                        if(status){
-                            Toast.makeText(requireContext(),"Log-in Successful",Toast.LENGTH_LONG).show()
-//                            var home = HomePage()
-//                            home.arguments = bundle
-                            loading.dismiss()
-                            sharedViewModel.setGoToHomePageStatus(true)
-                        }else{
-                            loading.dismiss()
-                            Toast.makeText(requireContext(),"read failed",Toast.LENGTH_LONG).show()
-                        }
-                    }
-
-                }else{
-                    loading.dismiss()
-                    Toast.makeText(requireContext(),"Log-in failed",Toast.LENGTH_LONG).show()
-                }
-            }
+            sharedViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
         }
     }
 }
+
