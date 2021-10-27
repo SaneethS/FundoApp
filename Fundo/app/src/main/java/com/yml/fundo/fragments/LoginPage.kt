@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.facebook.CallbackManager
@@ -18,6 +19,8 @@ import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.Database
 import com.yml.fundo.util.Util
 import com.yml.fundo.util.Validator
+import com.yml.fundo.viewmodel.LoginViewModel
+import com.yml.fundo.viewmodel.LoginViewModelFactory
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 
@@ -25,6 +28,7 @@ class LoginPage:Fragment(R.layout.login_page) {
     lateinit var binding:LoginPageBinding
     lateinit var callbackManager: CallbackManager
     lateinit var sharedViewModel: SharedViewModel
+    lateinit var loginViewModel: LoginViewModel
 
     companion object{
         lateinit var loading:Dialog
@@ -37,6 +41,8 @@ class LoginPage:Fragment(R.layout.login_page) {
         loading.setContentView(R.layout.loading_screen)
         callbackManager = CallbackManager.Factory.create()
         sharedViewModel = ViewModelProvider(requireActivity(),SharedViewModelFactory())[SharedViewModel::class.java]
+        loginViewModel = ViewModelProvider(this,LoginViewModelFactory())[LoginViewModel::class.java]
+        (requireActivity() as AppCompatActivity).supportActionBar?.hide()
 
         binding.registerLink.setOnClickListener {
             sharedViewModel.setGoToRegisterPageStatus(true)
@@ -56,11 +62,9 @@ class LoginPage:Fragment(R.layout.login_page) {
             sharedViewModel.setGoToResetPasswordStatus(true)
         }
 
+        loginObserver()
 
     }
-
-
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -83,7 +87,7 @@ class LoginPage:Fragment(R.layout.login_page) {
             }
 
             override fun onSuccess(result: LoginResult) {
-                sharedViewModel.facebookLoginWithUser(result.accessToken)
+                loginViewModel.facebookLoginWithUser(result.accessToken)
 
             }
 
@@ -94,7 +98,31 @@ class LoginPage:Fragment(R.layout.login_page) {
         var email = binding.usernameField
         var password = binding.passwordField
         if(Validator.loginValidation(email,password)){
-            sharedViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+            loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+        }
+    }
+
+    fun loginObserver(){
+        loginViewModel.loginStatus.observe(viewLifecycleOwner) {
+            if(it?.loginStatus == true){
+                loading.dismiss()
+                sharedViewModel.setGoToHomePageStatus(true)
+
+            }else{
+                loading.dismiss()
+                Toast.makeText(requireContext(),"Log-in failed", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){
+            if(it?.loginStatus == true){
+                loading.dismiss()
+                sharedViewModel.setGoToHomePageStatus(true)
+
+            }else{
+                loading.dismiss()
+                Toast.makeText(requireContext(),"Facebook Log-in failed", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

@@ -10,24 +10,19 @@ import com.yml.fundo.service.Authentication
 
 class SharedViewModel: ViewModel() {
     private val _goToHomePageStatus = MutableLiveData<Boolean>()
-    private val _goToLoginPageStatus = MutableLiveData<Boolean>()
-    private val _goToRegisterPageStatus = MutableLiveData<Boolean>()
-    private val _goToSplashScreenStatus = MutableLiveData<Boolean>()
-    private val _goToResetPasswordStatus = MutableLiveData<Boolean>()
-    private val _loginStatus = MutableLiveData<User>()
-    private val _registerStatus = MutableLiveData<User>()
-    private val _facebookLoginStatus = MutableLiveData<User>()
-    private val _resetPasswordStatus = MutableLiveData<String>()
-
     val goToHomePageStatus = _goToHomePageStatus as LiveData<Boolean>
+
+    private val _goToLoginPageStatus = MutableLiveData<Boolean>()
     val goToLoginPageStatus = _goToLoginPageStatus as LiveData<Boolean>
+
+    private val _goToRegisterPageStatus = MutableLiveData<Boolean>()
     val goToRegisterPageStatus = _goToRegisterPageStatus as LiveData<Boolean>
+
+    private val _goToSplashScreenStatus = MutableLiveData<Boolean>()
     val goToSplashScreenStatus =  _goToSplashScreenStatus as LiveData<Boolean>
+
+    private val _goToResetPasswordStatus = MutableLiveData<Boolean>()
     val goToResetPasswordStatus = _goToResetPasswordStatus as LiveData<Boolean>
-    val loginStatus = _loginStatus as LiveData<User>
-    val registerStatus = _registerStatus as LiveData<User>
-    val facebookLoginStatus = _facebookLoginStatus as LiveData<User>
-    val resetPasswordStatus = _resetPasswordStatus as LiveData<String>
 
     fun setGoToHomePageStatus(status: Boolean){
         _goToHomePageStatus.value = status
@@ -47,29 +42,5 @@ class SharedViewModel: ViewModel() {
 
     fun setGoToResetPasswordStatus(status: Boolean){
         _goToResetPasswordStatus.value = status
-    }
-
-    fun loginWithEmailAndPassword(email: String, password: String){
-        Authentication.loginEmailPassword(email, password){
-            _loginStatus.value = it
-        }
-    }
-
-    fun registerNewUser(email: String,password: String){
-        Authentication.registerEmailPassword(email, password){
-            _registerStatus.value = it
-        }
-    }
-
-    fun facebookLoginWithUser(accessToken: AccessToken){
-        Authentication.signInWithFacebook(accessToken){
-            _facebookLoginStatus.value = it
-        }
-    }
-
-    fun resetPasswordOfUser(email: String){
-        Authentication.resetPassword(email){
-            _resetPasswordStatus.value = it
-        }
     }
 }

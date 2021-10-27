@@ -10,4 +10,10 @@ object Util {
         return UserDetails(user["name"].toString(), user["email"].toString(), user["mobileNo"].toString())
     }
 
+    fun createUserInSharedPref(userDetails:UserDetails){
+        SharedPref.addString("userEmail",userDetails.email)
+        SharedPref.addString("userName", userDetails.name)
+        SharedPref.addString("userMobile", userDetails.mobileNo)
+    }
+
 }

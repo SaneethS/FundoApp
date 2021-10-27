@@ -10,6 +10,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.yml.fundo.model.User
 import com.yml.fundo.model.UserDetails
+import com.yml.fundo.util.SharedPref
 
 object Authentication {
     private var fauth:FirebaseAuth = Firebase.auth
@@ -62,8 +63,6 @@ object Authentication {
                 var email = fbUser?.email.toString()
                 var mobileNo = fbUser?.phoneNumber.toString()
                 user = User(name,email,mobileNo,true)
-                val userDetails = UserDetails(name, email, mobileNo)
-                Database.setToDatabase(userDetails!!){}
                 callback(user)
             }else{
                 user = User("","","",false)
@@ -83,6 +82,7 @@ object Authentication {
     }
 
     fun logOut() {
+        SharedPref.clearAll()
         LoginManager.getInstance().logOut()
         fauth.signOut()
     }

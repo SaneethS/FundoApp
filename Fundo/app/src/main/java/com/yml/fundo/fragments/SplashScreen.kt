@@ -27,8 +27,6 @@ class SplashScreen:Fragment(R.layout.splash_screen) {
             if (user == null) {
                 sharedViewModel.setGoToLoginPageStatus(true)
             } else {
-                Database.getFromDatabase {
-                }
                 sharedViewModel.setGoToHomePageStatus(true)
             }
         }

@@ -14,17 +14,18 @@ import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.Database
 import com.yml.fundo.util.Util
 import com.yml.fundo.util.Validator
+import com.yml.fundo.viewmodel.RegisterViewModel
+import com.yml.fundo.viewmodel.RegisterViewModelFactory
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 
 class RegisterPage: Fragment(R.layout.register_page) {
 
     lateinit var sharedViewModel: SharedViewModel
+    lateinit var registerViewModel: RegisterViewModel
+    lateinit var loading: Dialog
+    lateinit var binding: RegisterPageBinding
 
-    companion object{
-        lateinit var loading: Dialog
-        lateinit var binding: RegisterPageBinding
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -32,7 +33,7 @@ class RegisterPage: Fragment(R.layout.register_page) {
         loading = Dialog(requireContext())
         loading.setContentView(R.layout.loading_screen)
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory())[SharedViewModel::class.java]
-
+        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory())[RegisterViewModel::class.java]
         binding.loginLink.setOnClickListener {
             sharedViewModel.setGoToLoginPageStatus(true)
         }
@@ -42,6 +43,7 @@ class RegisterPage: Fragment(R.layout.register_page) {
             register()
         }
 
+        registerObserver()
 
     }
 
@@ -51,9 +53,22 @@ class RegisterPage: Fragment(R.layout.register_page) {
         var password = binding.registerPassword
         var confirmPassword = binding.registerConfirmPassword
         var mobileNO = binding.registerMobile
+        val user = User(name.text.toString(),email.text.toString(),mobileNO.text.toString())
 
         if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO)){
-            sharedViewModel.registerNewUser(email.text.toString(), password.text.toString())
+            registerViewModel.registerNewUser(user, password.text.toString())
+        }
+    }
+
+    fun registerObserver(){
+        registerViewModel.registerStatus.observe(viewLifecycleOwner){
+            if(it){
+                loading.dismiss()
+                sharedViewModel.setGoToHomePageStatus(true)
+            }else{
+                loading.dismiss()
+                Toast.makeText(requireContext(),"Sign up unsuccessful",Toast.LENGTH_LONG).show()
+            }
         }
     }
 }
