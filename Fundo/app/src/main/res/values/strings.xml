@@ -4,5 +4,7 @@
     <string name="register">Register</string>
     <string name="facebook_app_id">935634950703648</string>
     <string name="fb_login_protocol_scheme">fb935634950703648</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 
 </resources>

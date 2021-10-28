@@ -99,6 +99,8 @@ class LoginPage:Fragment(R.layout.login_page) {
         var password = binding.passwordField
         if(Validator.loginValidation(email,password)){
             loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+        }else{
+            loading.dismiss()
         }
     }
 

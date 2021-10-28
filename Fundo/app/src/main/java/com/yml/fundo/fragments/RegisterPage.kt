@@ -57,6 +57,8 @@ class RegisterPage: Fragment(R.layout.register_page) {
 
         if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO)){
             registerViewModel.registerNewUser(user, password.text.toString())
+        }else{
+            loading.dismiss()
         }
     }
 

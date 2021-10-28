@@ -1,16 +1,25 @@
 package com.yml.fundo.fragments
 
+import android.app.Dialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.*
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
+import com.yml.fundo.activity.MainActivity
 import com.yml.fundo.databinding.HomePageBinding
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.util.SharedPref
@@ -18,18 +27,33 @@ import com.yml.fundo.viewmodel.HomeViewModel
 import com.yml.fundo.viewmodel.HomeViewModelFactory
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
+import java.util.jar.Manifest
 
 class HomePage:Fragment(R.layout.home_page) {
     lateinit var binding: HomePageBinding
     lateinit var sharedViewModel: SharedViewModel
     lateinit var homeViewModel: HomeViewModel
     lateinit var alertDialog: AlertDialog
+    lateinit var loading: Dialog
+    lateinit var dialogView: View
+    var menu: Menu? = null
 
+    companion object {
+        private val STORAGE_PERMISSION_RESULTCODE = 0
+        private val PICK_IMAGE_RESULTCODE = 1
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = HomePageBinding.bind(view)
-        sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory())[SharedViewModel::class.java]
+        sharedViewModel = ViewModelProvider(
+            requireActivity(),
+            SharedViewModelFactory()
+        )[SharedViewModel::class.java]
         homeViewModel = ViewModelProvider(this, HomeViewModelFactory())[HomeViewModel::class.java]
+        loading = Dialog(requireContext())
+        loading.setContentView(R.layout.loading_screen)
 
         (requireActivity() as AppCompatActivity).supportActionBar?.show()
         setHasOptionsMenu(true)
@@ -38,55 +62,113 @@ class HomePage:Fragment(R.layout.home_page) {
 
         binding.welcomeText.text = "Welcome!!"
 
+        val header = MainActivity.binding.navigationDrawer.getHeaderView(0)
+        val headerText:TextView = header.findViewById(R.id.drawer_name_text)
+        headerText.text = SharedPref.get("userName")
+
+        homeViewModel.userAvatarStatus.observe(viewLifecycleOwner) {
+            val userProfileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
+            userProfileIcon.setImageBitmap(it)
+
+            val item = menu?.findItem(R.id.profile_icon)
+            item?.icon = BitmapDrawable(it)
+
+            loading.dismiss()
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_RESULTCODE && data != null) {
+            loading.show()
+            var imageUri = data.data
+            val bitmap =
+                MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, imageUri)
+            homeViewModel.setUserAvatar(bitmap)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == STORAGE_PERMISSION_RESULTCODE && grantResults.isNotEmpty()) {
+            if ((grantResults[0] != PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(
+                    requireContext(),
+                    "Storage access required to upload image",
+                    Toast.LENGTH_LONG
+                )
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbar_menu,menu)
+        this.menu = menu
+        inflater.inflate(R.menu.toolbar_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var itemView = item.itemId
 
-        when(itemView){
+        when (itemView) {
             R.id.profile_icon -> showDialog()
         }
         return false
     }
 
-    private fun showDialog(){
+    private fun showDialog() {
         alertDialog.show()
     }
 
-    private fun dismissDialog(){
+    private fun dismissDialog() {
         alertDialog.dismiss()
     }
 
-    private fun profilePage(){
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.profile_dialog,null)
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun profilePage() {
+        dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.profile_dialog, null)
         alertDialog = AlertDialog.Builder(requireContext()).setView(dialogView).create()
 
-        val logout:MaterialButton = dialogView.findViewById(R.id.dialog_logout)
+        homeViewModel.getUserAvatar()
+        val logout: MaterialButton = dialogView.findViewById(R.id.dialog_logout)
         logout.setOnClickListener {
             homeViewModel.logoutFromHome()
             dismissDialog()
             sharedViewModel.setGoToLoginPageStatus(true)
         }
 
-        val close:ImageView = dialogView.findViewById(R.id.close_icon)
+        val close: ImageView = dialogView.findViewById(R.id.close_icon)
         close.setOnClickListener {
             dismissDialog()
         }
 
-        val name:TextView = dialogView.findViewById(R.id.dialog_name)
-        val email:TextView = dialogView.findViewById(R.id.dialog_email)
+        val name: TextView = dialogView.findViewById(R.id.dialog_name)
+        val email: TextView = dialogView.findViewById(R.id.dialog_email)
+        val mobile: TextView = dialogView.findViewById(R.id.dialog_mobile)
 
         name.text = SharedPref.get("userName")
         email.text = SharedPref.get("userEmail")
+        mobile.text = SharedPref.get("userMobile")
 
-
+        val profileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
+        profileIcon.setOnClickListener {
+            if (requireActivity().checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                pickImage()
+            }else{
+                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_RESULTCODE)
+            }
+        }
     }
 
-
+    private fun pickImage() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, PICK_IMAGE_RESULTCODE)
+    }
 }
-

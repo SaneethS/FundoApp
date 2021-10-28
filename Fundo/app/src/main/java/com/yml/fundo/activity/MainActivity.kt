@@ -2,7 +2,10 @@ package com.yml.fundo.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
@@ -17,8 +20,12 @@ import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
     lateinit var sharedViewModel: SharedViewModel
+    lateinit var toggle:ActionBarDrawerToggle
+
+    companion object{
+        lateinit var binding: ActivityMainBinding
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         SharedPref.initSharedPref(this)
         observeNavigation()
         sharedViewModel.setGoToSplashScreenStatus(true)
+        navigationDrawer()
 
     }
 
@@ -87,4 +95,25 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.fragment_view,fragment)
         fragmentTransaction.commit()
     }
+
+    fun navigationDrawer(){
+        toggle = ActionBarDrawerToggle(this,binding.drawerLayout,binding.homePageToolbar,R.string.open,R.string.close)
+        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.isDrawerIndicatorEnabled = true
+        toggle.syncState()
+
+
+
+        binding.navigationDrawer.setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.notes -> Toast.makeText(this,"Notes selected",Toast.LENGTH_LONG).show()
+                R.id.reminders-> Toast.makeText(this,"Reminder selected",Toast.LENGTH_LONG).show()
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
+
+    }
+
+
 }

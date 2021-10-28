@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="300dp"
-    android:layout_height="300dp">
+    android:layout_height="400dp">
 
     <ImageView
         android:id="@+id/close_icon"
@@ -11,15 +11,14 @@
         >
     </ImageView>
 
-    <ImageView
+    <ImageButton
         android:id="@+id/dialog_profile_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_baseline_account_circle_24"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:layout_below="@+id/close_icon"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:layout_below="@+id/close_icon">
-    </ImageView>
+        android:src="@drawable/ic_baseline_account_circle_24"></ImageButton>
 
     <TextView
         android:id="@+id/dialog_name"
@@ -44,11 +43,23 @@
         >
     </TextView>
 
+    <TextView
+        android:id="@+id/dialog_mobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_email"
+        android:text="mobile"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        >
+    </TextView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dialog_email"
+        android:layout_below="@+id/dialog_mobile"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:text="Logout">
