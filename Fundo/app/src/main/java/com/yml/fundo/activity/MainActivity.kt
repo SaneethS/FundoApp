@@ -2,6 +2,7 @@ package com.yml.fundo.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -23,9 +24,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedViewModel: SharedViewModel
     lateinit var toggle:ActionBarDrawerToggle
 
-    companion object{
-        lateinit var binding: ActivityMainBinding
-    }
+    lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +65,11 @@ class MainActivity : AppCompatActivity() {
                 goToResetPassword()
             }
         }
+        sharedViewModel.goToNotePageStatus.observe(this@MainActivity){
+            if(it){
+                goToNotePage()
+            }
+        }
 
     }
 
@@ -89,6 +93,10 @@ class MainActivity : AppCompatActivity() {
         switchFragment(HomePage())
     }
 
+    private fun goToNotePage(){
+        switchFragment(NotePage())
+    }
+
     fun switchFragment(fragment: Fragment){
         var fragmentManager = supportFragmentManager
         var fragmentTransaction = fragmentManager.beginTransaction()
@@ -97,7 +105,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun navigationDrawer(){
-        toggle = ActionBarDrawerToggle(this,binding.drawerLayout,binding.homePageToolbar,R.string.open,R.string.close)
+        toggle = object:ActionBarDrawerToggle(this,binding.drawerLayout,binding.homePageToolbar,R.string.open,R.string.close){
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                val header = binding.navigationDrawer.getHeaderView(0)
+                val headerText:TextView = header.findViewById(R.id.drawer_name_text)
+                headerText.text = SharedPref.get("userName")
+            }
+        }
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()

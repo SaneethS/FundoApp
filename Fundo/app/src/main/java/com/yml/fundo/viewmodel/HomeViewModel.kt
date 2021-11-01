@@ -5,12 +5,17 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.yml.fundo.model.Notes
 import com.yml.fundo.service.Authentication
+import com.yml.fundo.service.Database
 import com.yml.fundo.service.Storage
 
 class HomeViewModel: ViewModel() {
     private val _userAvatarStatus = MutableLiveData<Bitmap>()
     val userAvatarStatus = _userAvatarStatus as LiveData<Bitmap>
+
+    private val _getNewNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Notes>>
 
     fun logoutFromHome(){
         Authentication.logOut()
@@ -29,6 +34,12 @@ class HomeViewModel: ViewModel() {
             if(it != null){
                 _userAvatarStatus.value = it
             }
+        }
+    }
+
+    fun getNewNotes(){
+        Database.getNewNoteFromDB {
+            _getNewNotesStatus.value = it
         }
     }
 }

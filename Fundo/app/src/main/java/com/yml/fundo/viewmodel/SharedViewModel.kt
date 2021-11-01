@@ -24,6 +24,9 @@ class SharedViewModel: ViewModel() {
     private val _goToResetPasswordStatus = MutableLiveData<Boolean>()
     val goToResetPasswordStatus = _goToResetPasswordStatus as LiveData<Boolean>
 
+    private val _goToNotePageStatus = MutableLiveData<Boolean>()
+    val goToNotePageStatus = _goToNotePageStatus as LiveData<Boolean>
+
     fun setGoToHomePageStatus(status: Boolean){
         _goToHomePageStatus.value = status
     }
@@ -42,5 +45,9 @@ class SharedViewModel: ViewModel() {
 
     fun setGoToResetPasswordStatus(status: Boolean){
         _goToResetPasswordStatus.value = status
+    }
+
+    fun setGoToNotePageStatus(status: Boolean){
+        _goToNotePageStatus.value = status
     }
 }

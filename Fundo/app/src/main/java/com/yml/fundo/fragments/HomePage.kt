@@ -8,19 +8,20 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
 import com.yml.fundo.activity.MainActivity
+import com.yml.fundo.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
+import com.yml.fundo.model.Notes
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.util.SharedPref
 import com.yml.fundo.viewmodel.HomeViewModel
@@ -36,11 +37,14 @@ class HomePage:Fragment(R.layout.home_page) {
     lateinit var alertDialog: AlertDialog
     lateinit var loading: Dialog
     lateinit var dialogView: View
+    lateinit var recyclerView: RecyclerView
+    lateinit var myAdapter: MyAdapter
     var menu: Menu? = null
 
     companion object {
-        private val STORAGE_PERMISSION_RESULTCODE = 0
-        private val PICK_IMAGE_RESULTCODE = 1
+        private const val STORAGE_PERMISSION_RESULTCODE = 0
+        private const val PICK_IMAGE_RESULTCODE = 1
+        private val notesList = ArrayList<Notes>()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -60,11 +64,9 @@ class HomePage:Fragment(R.layout.home_page) {
 
         profilePage()
 
-        binding.welcomeText.text = "Welcome!!"
-
-        val header = MainActivity.binding.navigationDrawer.getHeaderView(0)
-        val headerText:TextView = header.findViewById(R.id.drawer_name_text)
-        headerText.text = SharedPref.get("userName")
+        binding.homeFab.setOnClickListener {
+            sharedViewModel.setGoToNotePageStatus(true)
+        }
 
         homeViewModel.userAvatarStatus.observe(viewLifecycleOwner) {
             val userProfileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
@@ -74,6 +76,19 @@ class HomePage:Fragment(R.layout.home_page) {
             item?.icon = BitmapDrawable(it)
 
             loading.dismiss()
+        }
+
+        myAdapter = MyAdapter(notesList)
+        recyclerView = binding.recyclerView
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.adapter = myAdapter
+        homeViewModel.getNewNotes()
+
+        homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner){
+            notesList.clear()
+            notesList.addAll(it)
+            myAdapter.notifyDataSetChanged()
         }
 
     }

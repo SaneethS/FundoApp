@@ -5,15 +5,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <TextView
-        android:id="@+id/welcomeText"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="80dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recycler_view">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/home_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name"
-        android:textSize="35sp"
-        android:layout_marginTop="150dp"
-        android:layout_centerHorizontal="true">
-    </TextView>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp"
+        android:background="@color/Goldenrod"
+        android:backgroundTint="@color/Goldenrod"
+        android:src="@drawable/add"
+        >
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 
 </RelativeLayout>

@@ -1,15 +1,11 @@
 package com.yml.fundo.service
 
-import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.yml.fundo.model.Notes
 import com.yml.fundo.model.User
 import com.yml.fundo.model.UserDetails
-import com.yml.fundo.service.Database.database
 import com.yml.fundo.util.Util
 
 object Database {
@@ -38,8 +34,39 @@ object Database {
             }else{
                 callback(false)
             }
-
         }
     }
 
+    fun addNewNoteToDB(notes: Notes, callback: (Boolean) -> Unit){
+        var uid = Authentication.getCurrentUser()?.uid.toString()
+        database.child("note").child(uid).push().setValue(notes).addOnCompleteListener {
+            if(it.isSuccessful){
+                callback(true)
+            }else{
+                callback(false)
+            }
+        }
+    }
+
+    fun getNewNoteFromDB(callback: (ArrayList<Notes>?) -> Unit){
+        var uid = Authentication.getCurrentUser()?.uid.toString()
+        database.child("note").child(uid).get().addOnCompleteListener {
+            if(it.isSuccessful){
+                var noteList = ArrayList<Notes>()
+                var dataSnapshot = it.result
+
+                if(dataSnapshot != null){
+                    for(item in dataSnapshot.children){
+                        var note = Notes(item.child("title").value.toString(), item.child("content").value.toString())
+                        noteList.add(note)
+                    }
+                    callback(noteList)
+                }else{
+                    callback(null)
+                }
+            }else{
+                callback(null)
+            }
+        }
+    }
 }
