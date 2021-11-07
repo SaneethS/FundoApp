@@ -38,6 +38,14 @@ class NotePage: Fragment(R.layout.note_page) {
             saveNote()
         }
 
+        binding.deleteButton.setOnClickListener {
+            if(noteKey == null){
+                Toast.makeText(requireContext(),"Create a note",Toast.LENGTH_LONG).show()
+            }else{
+                deleteNote()
+            }
+        }
+
         noteViewModel.addNewNoteStatus.observe(viewLifecycleOwner){
             if(it){
                 sharedViewModel.setGoToHomePageStatus(true)
@@ -49,7 +57,30 @@ class NotePage: Fragment(R.layout.note_page) {
         noteContents()
 
         noteViewModel.updateNoteStatus.observe(viewLifecycleOwner){
-            sharedViewModel.setGoToHomePageStatus(true)
+            if(it){
+                sharedViewModel.setGoToHomePageStatus(true)
+            }else{
+                Toast.makeText(requireContext(),"Update not successful",Toast.LENGTH_LONG).show()
+            }
+        }
+
+        noteViewModel.deleteNoteStatus.observe(viewLifecycleOwner){
+            if(it){
+                sharedViewModel.setGoToHomePageStatus(true)
+            }else{
+                Toast.makeText(requireContext(),"Deletion Failed",Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun deleteNote() {
+        var title = binding.titleText.text.toString()
+        var content = binding.noteText.text.toString()
+        if(title.isNotEmpty() || content.isNotEmpty()){
+            var note = NotesKey(title, content, noteKey!!)
+            noteViewModel.deleteNotes(note)
+        }else{
+            Toast.makeText(requireContext(),"Deletion Not Possible",Toast.LENGTH_LONG).show()
         }
     }
 
@@ -68,10 +99,7 @@ class NotePage: Fragment(R.layout.note_page) {
             var notes = Notes(title, content)
             noteViewModel.addNewNote(notes)
         }else{
-            val updateNotes = HomePage.notesList.find {
-                it.key == noteKey
-            }
-            var note = NotesKey(title, content, updateNotes!!.key)
+            var note = NotesKey(title, content, noteKey!!)
             noteViewModel.updateNotes(note)
             Toast.makeText(requireContext(),"Updated successfully",Toast.LENGTH_LONG).show()
         }

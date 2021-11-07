@@ -71,7 +71,7 @@ object Database {
         }
     }
 
-    fun updateNewNoteInDB(notes: NotesKey, callback: (NotesKey?) -> Unit){
+    fun updateNewNoteInDB(notes: NotesKey, callback: (Boolean) -> Unit){
         val notesMap = mapOf(
             "title" to notes.title,
             "content" to notes.content
@@ -79,9 +79,20 @@ object Database {
         var uid = Authentication.getCurrentUser()?.uid.toString()
         database.child("note").child(uid).child(notes.key).updateChildren(notesMap).addOnCompleteListener{
             if(it.isSuccessful){
-                callback(notes)
+                callback(true)
             }else{
-                callback(null)
+                callback(false)
+            }
+        }
+    }
+
+    fun deleteNoteFromDB(notes: NotesKey, callback: (Boolean) -> Unit){
+        var uid = Authentication.getCurrentUser()?.uid.toString()
+        database.child("note").child(uid).child(notes.key).removeValue().addOnCompleteListener {
+            if(it.isSuccessful){
+                callback(true)
+            }else{
+                callback(false)
             }
         }
     }

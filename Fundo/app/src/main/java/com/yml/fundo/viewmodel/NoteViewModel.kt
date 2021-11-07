@@ -11,8 +11,11 @@ class NoteViewModel: ViewModel() {
     private val _addNewNoteStatus = MutableLiveData<Boolean>()
     val addNewNoteStatus = _addNewNoteStatus as LiveData<Boolean>
 
-    private val _updateNoteStatus = MutableLiveData<NotesKey>()
-    val updateNoteStatus = _updateNoteStatus as LiveData<NotesKey>
+    private val _updateNoteStatus = MutableLiveData<Boolean>()
+    val updateNoteStatus = _updateNoteStatus as LiveData<Boolean>
+
+    private val _deleteNoteStatus = MutableLiveData<Boolean>()
+    val deleteNoteStatus = _deleteNoteStatus as LiveData<Boolean>
 
     fun addNewNote(notes: Notes){
         Database.addNewNoteToDB(notes){
@@ -25,6 +28,12 @@ class NoteViewModel: ViewModel() {
     fun updateNotes(notes: NotesKey){
         Database.updateNewNoteInDB(notes){
             _updateNoteStatus.value = it
+        }
+    }
+
+    fun deleteNotes(notes: NotesKey){
+        Database.deleteNoteFromDB(notes){
+            _deleteNoteStatus.value = it
         }
     }
 }

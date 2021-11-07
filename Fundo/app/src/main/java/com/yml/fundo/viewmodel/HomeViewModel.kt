@@ -1,11 +1,9 @@
 package com.yml.fundo.viewmodel
 
-import android.app.Service
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.yml.fundo.model.Notes
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.Database
 import com.yml.fundo.service.Storage

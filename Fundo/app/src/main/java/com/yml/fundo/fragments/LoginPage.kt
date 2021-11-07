@@ -1,6 +1,5 @@
 package com.yml.fundo.fragments
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -15,9 +14,6 @@ import com.facebook.FacebookException
 import com.facebook.login.LoginResult
 import com.yml.fundo.R
 import com.yml.fundo.databinding.LoginPageBinding
-import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
-import com.yml.fundo.util.Util
 import com.yml.fundo.util.Validator
 import com.yml.fundo.viewmodel.LoginViewModel
 import com.yml.fundo.viewmodel.LoginViewModelFactory

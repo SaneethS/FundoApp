@@ -1,15 +1,12 @@
 package com.yml.fundo.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
-import com.yml.fundo.activity.MainActivity
 import com.yml.fundo.databinding.SplashScreenBinding
 import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 

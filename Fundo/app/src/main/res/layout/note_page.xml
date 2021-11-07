@@ -13,6 +13,16 @@
         android:src="@drawable/back_black">
     </ImageView>
 
+    <ImageView
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/delete_icon"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_alignTop="@+id/back_button">
+    </ImageView>
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/title_text_layout"

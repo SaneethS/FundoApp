@@ -15,24 +15,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
-import com.yml.fundo.activity.MainActivity
 import com.yml.fundo.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
-import com.yml.fundo.model.Notes
-import com.yml.fundo.service.Authentication
 import com.yml.fundo.util.SharedPref
 import com.yml.fundo.viewmodel.HomeViewModel
 import com.yml.fundo.viewmodel.HomeViewModelFactory
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 import com.yml.fundo.wrapper.NotesKey
-import java.util.jar.Manifest
 
 class HomePage:Fragment(R.layout.home_page) {
     lateinit var binding: HomePageBinding

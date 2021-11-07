@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.ResetPasswordBinding
-import com.yml.fundo.service.Authentication
 import com.yml.fundo.util.Validator
 import com.yml.fundo.viewmodel.ResetPasswordViewModel
 import com.yml.fundo.viewmodel.ResetPasswordViewModelFactory

@@ -9,10 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.RegisterPageBinding
 import com.yml.fundo.model.User
-import com.yml.fundo.model.UserDetails
-import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
-import com.yml.fundo.util.Util
 import com.yml.fundo.util.Validator
 import com.yml.fundo.viewmodel.RegisterViewModel
 import com.yml.fundo.viewmodel.RegisterViewModelFactory
