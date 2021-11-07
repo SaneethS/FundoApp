@@ -31,6 +31,7 @@ import com.yml.fundo.viewmodel.HomeViewModel
 import com.yml.fundo.viewmodel.HomeViewModelFactory
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
+import com.yml.fundo.wrapper.NotesKey
 import java.util.jar.Manifest
 
 class HomePage:Fragment(R.layout.home_page) {
@@ -47,8 +48,8 @@ class HomePage:Fragment(R.layout.home_page) {
     companion object {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
-        private var notesList = ArrayList<Notes>()
-        private var searchList = ArrayList<Notes>()
+        var notesList = ArrayList<NotesKey>()
+        var searchList = ArrayList<NotesKey>()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -93,6 +94,7 @@ class HomePage:Fragment(R.layout.home_page) {
                 var bundle = Bundle()
                 bundle.putString("title", note.title)
                 bundle.putString("notes", note.content)
+                bundle.putString("key",note.key)
                 var notePage = NotePage()
                 notePage.arguments = bundle
                 requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_view, notePage).commit()
@@ -258,4 +260,10 @@ class HomePage:Fragment(R.layout.home_page) {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_RESULTCODE)
     }
+
+    fun syncList(){
+        searchList.clear()
+        searchList.addAll(notesList)
+    }
+
 }

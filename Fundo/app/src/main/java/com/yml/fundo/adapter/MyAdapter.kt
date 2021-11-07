@@ -7,8 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yml.fundo.R
 import com.yml.fundo.model.Notes
+import com.yml.fundo.wrapper.NotesKey
 
-class MyAdapter(private val notesList: ArrayList<Notes>):RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+class MyAdapter(private val notesList: ArrayList<NotesKey>):RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     private lateinit var clickListener: OnItemClickListener
 

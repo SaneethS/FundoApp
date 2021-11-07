@@ -7,6 +7,7 @@ import com.yml.fundo.model.Notes
 import com.yml.fundo.model.User
 import com.yml.fundo.model.UserDetails
 import com.yml.fundo.util.Util
+import com.yml.fundo.wrapper.NotesKey
 
 object Database {
     private var database:DatabaseReference = Firebase.database.reference
@@ -48,22 +49,37 @@ object Database {
         }
     }
 
-    fun getNewNoteFromDB(callback: (ArrayList<Notes>?) -> Unit){
+    fun getNewNoteFromDB(callback: (ArrayList<NotesKey>?) -> Unit){
         var uid = Authentication.getCurrentUser()?.uid.toString()
         database.child("note").child(uid).get().addOnCompleteListener {
             if(it.isSuccessful){
-                var noteList = ArrayList<Notes>()
+                var noteList = ArrayList<NotesKey>()
                 var dataSnapshot = it.result
 
                 if(dataSnapshot != null){
                     for(item in dataSnapshot.children){
-                        var note = Notes(item.child("title").value.toString(), item.child("content").value.toString())
+                        var note = NotesKey(item.child("title").value.toString(), item.child("content").value.toString(),item.key.toString())
                         noteList.add(note)
                     }
                     callback(noteList)
                 }else{
                     callback(null)
                 }
+            }else{
+                callback(null)
+            }
+        }
+    }
+
+    fun updateNewNoteInDB(notes: NotesKey, callback: (NotesKey?) -> Unit){
+        val notesMap = mapOf(
+            "title" to notes.title,
+            "content" to notes.content
+        )
+        var uid = Authentication.getCurrentUser()?.uid.toString()
+        database.child("note").child(uid).child(notes.key).updateChildren(notesMap).addOnCompleteListener{
+            if(it.isSuccessful){
+                callback(notes)
             }else{
                 callback(null)
             }
