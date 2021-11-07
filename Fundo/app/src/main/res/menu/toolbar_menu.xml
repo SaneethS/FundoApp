@@ -2,6 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/search_icon"
+        android:title="Search"
+        android:icon="@drawable/search_icon"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="android.widget.SearchView"
+        >
+    </item>
+    <item
+        android:id="@+id/toggle_view"
+        android:title="View"
+        app:actionLayout="@layout/toggle_notes_view"
+        app:showAsAction="always"
+        >
+    </item>
+    <item
         android:id="@+id/profile_icon"
         android:title="Profile"
         app:showAsAction="always"

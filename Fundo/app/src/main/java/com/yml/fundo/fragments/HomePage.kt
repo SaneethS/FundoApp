@@ -12,10 +12,13 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
 import com.yml.fundo.activity.MainActivity
@@ -44,7 +47,8 @@ class HomePage:Fragment(R.layout.home_page) {
     companion object {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
-        private val notesList = ArrayList<Notes>()
+        private var notesList = ArrayList<Notes>()
+        private var searchList = ArrayList<Notes>()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -78,9 +82,29 @@ class HomePage:Fragment(R.layout.home_page) {
             loading.dismiss()
         }
 
-        myAdapter = MyAdapter(notesList)
+        myRecyclerView()
+        noteClick()
+    }
+
+    private fun noteClick() {
+        myAdapter.setOnItemClickListener(object : MyAdapter.OnItemClickListener{
+            override fun onItemClick(position: Int) {
+                var note = searchList[position]
+                var bundle = Bundle()
+                bundle.putString("title", note.title)
+                bundle.putString("notes", note.content)
+                var notePage = NotePage()
+                notePage.arguments = bundle
+                requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_view, notePage).commit()
+            }
+
+        })
+    }
+
+    private fun myRecyclerView() {
+        myAdapter = MyAdapter(searchList)
         recyclerView = binding.recyclerView
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = myAdapter
         homeViewModel.getNewNotes()
@@ -88,9 +112,10 @@ class HomePage:Fragment(R.layout.home_page) {
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner){
             notesList.clear()
             notesList.addAll(it)
+            searchList.clear()
+            searchList.addAll(it)
             myAdapter.notifyDataSetChanged()
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -127,6 +152,9 @@ class HomePage:Fragment(R.layout.home_page) {
         this.menu = menu
         inflater.inflate(R.menu.toolbar_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
+
+        changeNotesLayout()
+        searchNotes()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -136,6 +164,50 @@ class HomePage:Fragment(R.layout.home_page) {
             R.id.profile_icon -> showDialog()
         }
         return false
+    }
+
+    private fun changeNotesLayout(){
+        var toggleView = menu?.getItem(1)
+        var view = toggleView?.actionView
+        var viewSelector = view?.findViewById<AppCompatToggleButton>(R.id.toggle_button)
+        viewSelector?.setOnCheckedChangeListener{ _,isChecked ->
+            if(isChecked){
+                recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            }else{
+                recyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
+            }
+
+        }
+    }
+
+    private fun searchNotes(){
+        val searchItem = menu?.getItem(0)
+        val searchView = searchItem?.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                searchList.clear()
+                var searchText = newText!!.lowercase()
+                if(searchText.isNotEmpty()){
+                    notesList.forEach {
+                        if(it.title.lowercase().contains(searchText) || it.content.lowercase().contains(searchText)){
+                            searchList.add(it)
+                        }
+                    }
+                    myAdapter.notifyDataSetChanged()
+                }else{
+                    searchList.clear()
+                    searchList.addAll(notesList)
+                    myAdapter.notifyDataSetChanged()
+                }
+                return false
+            }
+
+        })
     }
 
     private fun showDialog() {

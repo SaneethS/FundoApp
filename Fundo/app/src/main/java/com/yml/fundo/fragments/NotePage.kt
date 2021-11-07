@@ -41,6 +41,15 @@ class NotePage: Fragment(R.layout.note_page) {
                 Toast.makeText(requireContext(),"note is not saved",Toast.LENGTH_LONG).show()
             }
         }
+
+        noteContents()
+    }
+
+    private fun noteContents() {
+        var title = arguments?.getString("title")
+        var notes = arguments?.getString("notes")
+        binding.titleText.setText(title)
+        binding.noteText.setText(notes)
     }
 
     private fun saveNote() {
