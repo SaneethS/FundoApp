@@ -5,7 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yml.fundo.model.User
 import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
+import com.yml.fundo.service.DatabaseService
+import com.yml.fundo.service.FirebaseDatabase
 
 class RegisterViewModel: ViewModel() {
     private val _registerStatus = MutableLiveData<Boolean>()
@@ -13,7 +14,7 @@ class RegisterViewModel: ViewModel() {
 
     fun registerNewUser(user: User,password: String){
         Authentication.registerEmailPassword(user.email, password){
-            Database.setToDatabase(user){
+            DatabaseService.setToDatabase(user){
                 _registerStatus.value = it
             }
 

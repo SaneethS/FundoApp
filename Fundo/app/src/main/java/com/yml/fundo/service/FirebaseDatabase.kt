@@ -9,7 +9,7 @@ import com.yml.fundo.model.UserDetails
 import com.yml.fundo.util.Util
 import com.yml.fundo.wrapper.NotesKey
 
-object Database {
+object FirebaseDatabase {
     private var database:DatabaseReference = Firebase.database.reference
 
     fun setToDatabase(user: User, callback: (Boolean)->Unit){

@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.facebook.AccessToken
 import com.yml.fundo.model.User
 import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
+import com.yml.fundo.service.DatabaseService
+import com.yml.fundo.service.FirebaseDatabase
 
 class LoginViewModel: ViewModel() {
     private val _loginStatus = MutableLiveData<User>()
@@ -17,7 +18,7 @@ class LoginViewModel: ViewModel() {
 
     fun loginWithEmailAndPassword(email: String, password: String){
         Authentication.loginEmailPassword(email, password){user->
-            Database.getFromDatabase {
+            DatabaseService.getFromDatabase {
                 _loginStatus.value = user
             }
         }
@@ -26,7 +27,7 @@ class LoginViewModel: ViewModel() {
     fun facebookLoginWithUser(accessToken: AccessToken){
         Authentication.signInWithFacebook(accessToken){user->
             if (user != null) {
-                Database.setToDatabase(user){
+                DatabaseService.setToDatabase(user){
                     _facebookLoginStatus.value = user
                 }
             }

@@ -12,11 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.fragments.*
-import com.yml.fundo.model.UserDetails
-import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
 import com.yml.fundo.util.SharedPref
-import com.yml.fundo.util.Util
 import com.yml.fundo.viewmodel.SharedViewModel
 import com.yml.fundo.viewmodel.SharedViewModelFactory
 

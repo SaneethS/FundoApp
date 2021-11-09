@@ -5,7 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yml.fundo.service.Authentication
-import com.yml.fundo.service.Database
+import com.yml.fundo.service.DatabaseService
+import com.yml.fundo.service.FirebaseDatabase
 import com.yml.fundo.service.Storage
 import com.yml.fundo.wrapper.NotesKey
 
@@ -37,7 +38,7 @@ class HomeViewModel: ViewModel() {
     }
 
     fun getNewNotes(){
-        Database.getNewNoteFromDB {
+        DatabaseService.getNewNoteFromDB {
             _getNewNotesStatus.value = it
         }
     }
