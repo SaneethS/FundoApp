@@ -51,7 +51,7 @@ class RegisterPage: Fragment(R.layout.register_page) {
         var mobileNO = binding.registerMobile
         val user = User(name.text.toString(),email.text.toString(),mobileNO.text.toString())
 
-        if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO)){
+        if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO,requireContext())){
             registerViewModel.registerNewUser(user, password.text.toString())
         }else{
             loading.dismiss()
@@ -65,7 +65,7 @@ class RegisterPage: Fragment(R.layout.register_page) {
                 sharedViewModel.setGoToHomePageStatus(true)
             }else{
                 loading.dismiss()
-                Toast.makeText(requireContext(),"Sign up unsuccessful",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.sign_up_unsuccessful_toast),Toast.LENGTH_LONG).show()
             }
         }
     }

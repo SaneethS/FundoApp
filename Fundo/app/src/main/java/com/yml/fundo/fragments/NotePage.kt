@@ -40,7 +40,7 @@ class NotePage: Fragment(R.layout.note_page) {
 
         binding.deleteButton.setOnClickListener {
             if(noteKey == null){
-                Toast.makeText(requireContext(),"Create a note",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.create_a_note_toast),Toast.LENGTH_LONG).show()
             }else{
                 deleteNote()
             }
@@ -50,7 +50,7 @@ class NotePage: Fragment(R.layout.note_page) {
             if(it){
                 sharedViewModel.setGoToHomePageStatus(true)
             }else{
-                Toast.makeText(requireContext(),"note is not saved",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.note_not_saved_toast),Toast.LENGTH_LONG).show()
             }
         }
 
@@ -60,7 +60,7 @@ class NotePage: Fragment(R.layout.note_page) {
             if(it){
                 sharedViewModel.setGoToHomePageStatus(true)
             }else{
-                Toast.makeText(requireContext(),"Update not successful",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.update_not_succesful_toast),Toast.LENGTH_LONG).show()
             }
         }
 
@@ -68,7 +68,7 @@ class NotePage: Fragment(R.layout.note_page) {
             if(it){
                 sharedViewModel.setGoToHomePageStatus(true)
             }else{
-                Toast.makeText(requireContext(),"Deletion Failed",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.deletion_failed_toast),Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -80,7 +80,7 @@ class NotePage: Fragment(R.layout.note_page) {
             var note = NotesKey(title, content, noteKey!!)
             noteViewModel.deleteNotes(note)
         }else{
-            Toast.makeText(requireContext(),"Deletion Not Possible",Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(),getString(R.string.deletion_not_posssible_toast),Toast.LENGTH_LONG).show()
         }
     }
 
@@ -101,7 +101,7 @@ class NotePage: Fragment(R.layout.note_page) {
         }else{
             var note = NotesKey(title, content, noteKey!!)
             noteViewModel.updateNotes(note)
-            Toast.makeText(requireContext(),"Updated successfully",Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(),getString(R.string.updated_successfully_toast),Toast.LENGTH_LONG).show()
         }
     }
 }

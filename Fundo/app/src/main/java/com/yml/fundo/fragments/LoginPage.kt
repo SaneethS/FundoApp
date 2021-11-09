@@ -74,12 +74,12 @@ class LoginPage:Fragment(R.layout.login_page) {
         fbLogin.registerCallback(callbackManager,object : FacebookCallback<LoginResult>{
             override fun onCancel() {
                 loading.dismiss()
-                Toast.makeText(requireContext(),"Canceled",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.cancelled_toast),Toast.LENGTH_LONG).show()
             }
 
             override fun onError(error: FacebookException) {
                 loading.dismiss()
-                Toast.makeText(requireContext(),"error occurred",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.error_occured_toast),Toast.LENGTH_LONG).show()
             }
 
             override fun onSuccess(result: LoginResult) {
@@ -93,7 +93,7 @@ class LoginPage:Fragment(R.layout.login_page) {
     private fun login() {
         var email = binding.usernameField
         var password = binding.passwordField
-        if(Validator.loginValidation(email,password)){
+        if(Validator.loginValidation(email,password,requireContext())){
             loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
         }else{
             loading.dismiss()
@@ -108,7 +108,7 @@ class LoginPage:Fragment(R.layout.login_page) {
 
             }else{
                 loading.dismiss()
-                Toast.makeText(requireContext(),"Log-in failed", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.login_failed_toast), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -119,7 +119,7 @@ class LoginPage:Fragment(R.layout.login_page) {
 
             }else{
                 loading.dismiss()
-                Toast.makeText(requireContext(),"Facebook Log-in failed", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(),getString(R.string.facebook_login_failed_toast), Toast.LENGTH_LONG).show()
             }
         }
     }

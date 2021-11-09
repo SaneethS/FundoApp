@@ -4,13 +4,13 @@
     tools:showIn="navigation_view">
     <item
         android:id="@+id/notes"
-        android:title="Notes"
+        android:title="@string/drawer_notes_text"
         android:icon="@drawable/note">
     </item>
 
     <item
         android:id="@+id/reminders"
-        android:title="Reminders"
+        android:title="@string/drawer_reminder_text"
         android:icon="@drawable/reminder">
     </item>
 </menu>

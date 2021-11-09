@@ -8,7 +8,7 @@
         android:id="@+id/back_button"
         android:layout_width="50dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="30dp"
         android:src="@drawable/back_black">
     </ImageView>
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/delete_icon"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_alignTop="@+id/back_button">
     </ImageView>
 
@@ -34,10 +34,10 @@
             android:id="@+id/title_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Title"
+            android:hint="@string/note_title_text"
             android:textSize="30sp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:layout_marginTop="20dp">
         </com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
@@ -52,10 +52,10 @@
             android:id="@+id/note_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Note"
+            android:hint="@string/note_content_text"
             android:textSize="25sp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:layout_marginTop="20dp"
             >
         </com.google.android.material.textfield.TextInputEditText>
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="40dp"
         android:backgroundTint="@color/Goldenrod"
         android:text="save"

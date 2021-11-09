@@ -1,10 +1,10 @@
 package com.yml.fundo.util
 
-import android.provider.ContactsContract
+import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import com.google.android.material.textfield.TextInputEditText
-import java.util.regex.Pattern
+import com.yml.fundo.R
 
 object Validator {
 
@@ -12,28 +12,29 @@ object Validator {
                                email: TextInputEditText,
                                password: TextInputEditText,
                                confirmPassword: TextInputEditText
-                               ,mobileNo: TextInputEditText): Boolean
+                               ,mobileNo: TextInputEditText,
+    context:Context): Boolean
     {
-        var status:Boolean = true
+        var status = true
         if(validateName(name.text.toString())){
-            name.setError("Enter valid name")
+            name.setError(context.getString(R.string.validate_name))
             status = false
         }
         if(validateEmail(email.text.toString())){
-            email.setError("Enter valid Email")
+            email.setError(context.getString(R.string.validate_email))
             status = false
         }
         if(validateMobileNo(mobileNo.text.toString())){
-            mobileNo.setError("Enter valid mobile number")
+            mobileNo.setError(context.getString(R.string.validate_mobile_no))
             status = false
         }
         if(validatePassword( password.text.toString())){
-            password.setError("Enter valid password")
-            confirmPassword.setError("Enter valid password")
+            password.setError(context.getString(R.string.validate_password))
+            confirmPassword.setError(context.getString(R.string.validate_password))
             status = false
         }
         if(password.text.toString() != confirmPassword.text.toString()){
-            confirmPassword.setError("Enter same Password")
+            confirmPassword.setError(context.getString(R.string.password_confirm_password))
             status = false
         }
         Log.i("validator","status = $status")
@@ -41,23 +42,24 @@ object Validator {
     }
 
     fun loginValidation(email: TextInputEditText,
-                        password: TextInputEditText): Boolean{
-        var status:Boolean = true
+                        password: TextInputEditText,
+    context: Context): Boolean{
+        var status = true
         if(validateEmail(email.text.toString())){
-            email.setError("Enter valid Email")
+            email.setError(context.getString(R.string.validate_email))
             status = false
         }
         if(validatePassword( password.text.toString())){
-            password.setError("Enter valid password")
+            password.setError(context.getString(R.string.validate_password))
             status = false
         }
         return status
     }
 
-    fun forgotPasswordValidator(email: TextInputEditText):Boolean{
-        var status:Boolean = true
+    fun forgotPasswordValidator(email: TextInputEditText, context: Context):Boolean{
+        var status = true
         if(validateEmail(email.text.toString())){
-            email.setError("Enter valid Email")
+            email.setError(context.getString(R.string.validate_email))
             status = false
         }
         return status

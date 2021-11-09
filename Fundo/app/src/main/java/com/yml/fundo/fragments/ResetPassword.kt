@@ -44,7 +44,7 @@ class ResetPassword: Fragment(R.layout.reset_password) {
     }
 
     fun resetPassword(email: String){
-        if(Validator.forgotPasswordValidator(binding.resetEmail)){
+        if(Validator.forgotPasswordValidator(binding.resetEmail, requireContext())){
             resetPasswordViewModel.resetPasswordOfUser(email)
 
         }

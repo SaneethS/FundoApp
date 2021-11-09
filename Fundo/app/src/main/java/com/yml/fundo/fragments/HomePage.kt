@@ -138,7 +138,7 @@ class HomePage:Fragment(R.layout.home_page) {
             if ((grantResults[0] != PackageManager.PERMISSION_GRANTED)) {
                 Toast.makeText(
                     requireContext(),
-                    "Storage access required to upload image",
+                    getString(R.string.storage_access_required_toast),
                     Toast.LENGTH_LONG
                 )
             }

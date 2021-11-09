@@ -47,6 +47,7 @@ object Database {
                 callback(false)
             }
         }
+
     }
 
     fun getNewNoteFromDB(callback: (ArrayList<NotesKey>?) -> Unit){
