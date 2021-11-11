@@ -36,8 +36,10 @@ class LoginPage:Fragment(R.layout.login_page) {
         loading = Dialog(requireContext())
         loading.setContentView(R.layout.loading_screen)
         callbackManager = CallbackManager.Factory.create()
-        sharedViewModel = ViewModelProvider(requireActivity(),SharedViewModelFactory())[SharedViewModel::class.java]
-        loginViewModel = ViewModelProvider(this,LoginViewModelFactory())[LoginViewModel::class.java]
+        sharedViewModel = ViewModelProvider(requireActivity(),
+            SharedViewModelFactory())[SharedViewModel::class.java]
+        loginViewModel = ViewModelProvider(this,
+            LoginViewModelFactory())[LoginViewModel::class.java]
         (requireActivity() as AppCompatActivity).supportActionBar?.hide()
 
         binding.registerLink.setOnClickListener {

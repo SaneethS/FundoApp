@@ -3,11 +3,15 @@ package com.yml.fundo.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
 import com.yml.fundo.model.User
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.DatabaseService
 import com.yml.fundo.service.FirebaseDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginViewModel: ViewModel() {
     private val _loginStatus = MutableLiveData<User>()
@@ -18,7 +22,8 @@ class LoginViewModel: ViewModel() {
 
     fun loginWithEmailAndPassword(email: String, password: String){
         Authentication.loginEmailPassword(email, password){user->
-            DatabaseService.getFromDatabase {
+            viewModelScope.launch {
+                DatabaseService.getFromDatabase()
                 _loginStatus.value = user
             }
         }
@@ -26,9 +31,11 @@ class LoginViewModel: ViewModel() {
 
     fun facebookLoginWithUser(accessToken: AccessToken){
         Authentication.signInWithFacebook(accessToken){user->
-            if (user != null) {
-                DatabaseService.setToDatabase(user){
+            viewModelScope.launch {
+                if (user != null) {
+                    DatabaseService.setToDatabase(user)
                     _facebookLoginStatus.value = user
+
                 }
             }
         }

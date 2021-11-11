@@ -30,7 +30,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.homePageToolbar)
         SharedPref.initSharedPref(this)
         observeNavigation()
-        sharedViewModel.setGoToSplashScreenStatus(true)
+        if(savedInstanceState == null){
+            goToSplashScreen()
+        }
         navigationDrawer()
 
     }

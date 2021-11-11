@@ -5,32 +5,81 @@ import com.yml.fundo.model.User
 import com.yml.fundo.model.UserDetails
 import com.yml.fundo.util.Util
 import com.yml.fundo.wrapper.NotesKey
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object DatabaseService {
 
-    fun setToDatabase(user: User, callback: (Boolean)->Unit){
-        FirebaseDatabase.setToDatabase(user){
-            callback(it)
+    suspend fun setToDatabase(user: User){
+        withContext(Dispatchers.IO){
+            try{
+                FirebaseDatabase.setToDatabase(user)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+
         }
     }
 
-    fun getFromDatabase(callback: (Boolean) -> Unit){
-        FirebaseDatabase.getFromDatabase(callback)
+    suspend fun getFromDatabase(){
+        withContext(Dispatchers.IO){
+            try {
+                FirebaseDatabase.getFromDatabase()
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+        }
     }
 
-    fun addNewNoteToDB(notes: Notes, callback: (Boolean) -> Unit){
-        FirebaseDatabase.addNewNoteToDB(notes,callback)
+    suspend fun addNewNoteToDB(notes: Notes):Boolean{
+        return withContext(Dispatchers.IO){
+            try {
+                FirebaseDatabase.addNewNoteToDB(notes)
+                true
+            }catch (e: Exception){
+                e.printStackTrace()
+                false
+            }
+
+        }
     }
 
-    fun getNewNoteFromDB(callback: (ArrayList<NotesKey>?) -> Unit){
-        FirebaseDatabase.getNewNoteFromDB(callback)
+    suspend fun getNewNoteFromDB():ArrayList<NotesKey>?{
+        return withContext(Dispatchers.IO){
+            try {
+                var notesList = FirebaseDatabase.getNewNoteFromDB()
+                notesList
+            }catch (e:Exception){
+                e.printStackTrace()
+                null
+            }
+        }
+
     }
 
-    fun updateNewNoteInDB(notes: NotesKey, callback: (Boolean) -> Unit){
-        FirebaseDatabase.updateNewNoteInDB(notes,callback)
+    suspend fun updateNewNoteInDB(notes: NotesKey):Boolean{
+        return withContext(Dispatchers.IO){
+            try {
+                FirebaseDatabase.updateNewNoteInDB(notes)
+                true
+            }catch (e: Exception){
+                e.printStackTrace()
+                false
+            }
+
+        }
+
     }
 
-    fun deleteNoteFromDB(notes: NotesKey, callback: (Boolean) -> Unit){
-        FirebaseDatabase.deleteNoteFromDB(notes,callback)
+    suspend fun deleteNoteFromDB(notes: NotesKey):Boolean{
+        return withContext(Dispatchers.IO){
+            try {
+                FirebaseDatabase.deleteNoteFromDB(notes)
+                true
+            }catch (e: Exception){
+                e.printStackTrace()
+                false
+            }
+        }
     }
 }

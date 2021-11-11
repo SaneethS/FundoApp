@@ -4,11 +4,14 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yml.fundo.service.Authentication
 import com.yml.fundo.service.DatabaseService
 import com.yml.fundo.service.FirebaseDatabase
 import com.yml.fundo.service.Storage
 import com.yml.fundo.wrapper.NotesKey
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class HomeViewModel: ViewModel() {
     private val _userAvatarStatus = MutableLiveData<Bitmap>()
@@ -22,24 +25,35 @@ class HomeViewModel: ViewModel() {
     }
 
     fun setUserAvatar(bitmap: Bitmap){
-        Storage.setAvatar(bitmap){
-            if(it){
-                _userAvatarStatus.value = bitmap
+        viewModelScope.launch {
+            try {
+                var status = Storage.setAvatar(bitmap)
+                if(status){
+                    _userAvatarStatus.value = bitmap
+                }
+            }catch (e:Exception){
+                e.printStackTrace()
             }
         }
     }
 
     fun getUserAvatar(){
-        Storage.getAvatar {
-            if(it != null){
-                _userAvatarStatus.value = it
+        viewModelScope.launch {
+            var bitmap = Storage.getAvatar()
+            if(bitmap != null){
+                _userAvatarStatus.value = bitmap
             }
         }
     }
 
+
+
     fun getNewNotes(){
-        DatabaseService.getNewNoteFromDB {
-            _getNewNotesStatus.value = it
+        viewModelScope.launch {
+            var resultNotes = DatabaseService.getNewNoteFromDB()
+            if(resultNotes != null){
+                _getNewNotesStatus.value = resultNotes
+            }
         }
     }
 }
