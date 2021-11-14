@@ -1,5 +1,6 @@
 package com.yml.fundo.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
 import com.yml.fundo.data.wrapper.User
 import com.yml.fundo.auth.Authentication
+import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.service.DatabaseService
 import kotlinx.coroutines.launch
 
@@ -20,8 +22,15 @@ class LoginViewModel: ViewModel() {
     fun loginWithEmailAndPassword(email: String, password: String){
         Authentication.loginEmailPassword(email, password){user->
             viewModelScope.launch {
-                DatabaseService.getFromDatabase()
-                _loginStatus.value = user
+                if (user != null) {
+                    var userDet =DatabaseService.setToDatabase(user)
+                    if(userDet != null){
+                        SharedPref.addUid(userDet.uid)
+                        DatabaseService.addCloudDataToLocalDB(userDet)
+                        Log.i("Login","${userDet.uid}")
+                        _loginStatus.value = userDet
+                    }
+                }
             }
         }
     }
@@ -30,9 +39,12 @@ class LoginViewModel: ViewModel() {
         Authentication.signInWithFacebook(accessToken){user->
             viewModelScope.launch {
                 if (user != null) {
-                    DatabaseService.setToDatabase(user)
-                    _facebookLoginStatus.value = user
-
+                    var userDet = DatabaseService.setNewUserToDatabase(user)
+                    if(userDet != null){
+                        SharedPref.addUid(user.uid)
+                        DatabaseService.addCloudDataToLocalDB(userDet)
+                        _facebookLoginStatus.value = userDet
+                    }
                 }
             }
         }

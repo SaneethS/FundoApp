@@ -1,3 +1,5 @@
 package com.yml.fundo.data.model
 
-data class Notes(var title: String, var content:String)
+import java.util.*
+
+data class Notes(var title: String, var content: String, var dateModified : Date?)

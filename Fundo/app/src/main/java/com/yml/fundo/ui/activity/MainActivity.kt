@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.ActivityMainBinding
-import com.yml.fundo.ui.fragments.*
 import com.yml.fundo.ui.home.HomePage
 import com.yml.fundo.ui.login.LoginPage
 import com.yml.fundo.ui.note.NotePage
@@ -19,6 +18,7 @@ import com.yml.fundo.ui.register.RegisterPage
 import com.yml.fundo.ui.reset.ResetPassword
 import com.yml.fundo.ui.splash.SplashScreen
 import com.yml.fundo.common.SharedPref
+import com.yml.fundo.data.service.DatabaseService
 
 class MainActivity : AppCompatActivity() {
     lateinit var sharedViewModel: SharedViewModel
@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel = ViewModelProvider(this@MainActivity)[SharedViewModel::class.java]
         setSupportActionBar(binding.homePageToolbar)
         SharedPref.initSharedPref(this)
+        DatabaseService.initSqliteDBService(this)
         observeNavigation()
         if(savedInstanceState == null){
             goToSplashScreen()

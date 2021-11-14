@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yml.fundo.data.model.Notes
 import com.yml.fundo.data.service.DatabaseService
-import com.yml.fundo.data.model.NotesKey
+import com.yml.fundo.data.wrapper.NotesKey
+import com.yml.fundo.data.wrapper.User
 import kotlinx.coroutines.launch
+import java.util.*
 
 class NoteViewModel: ViewModel() {
     private val _addNewNoteStatus = MutableLiveData<Boolean>()
@@ -19,29 +21,47 @@ class NoteViewModel: ViewModel() {
     private val _deleteNoteStatus = MutableLiveData<Boolean>()
     val deleteNoteStatus = _deleteNoteStatus as LiveData<Boolean>
 
-    fun addNewNote(notes: Notes){
+    private val _userDataStatus = MutableLiveData<User>()
+    val userDataStatus = _userDataStatus as LiveData<User>
+
+    fun addNewNote(notes: NotesKey, user: User){
         viewModelScope.launch {
-            var result = DatabaseService.addNewNoteToDB(notes)
+            var cal = Calendar.getInstance()
+            notes.dateModified = cal.time
+            var result = DatabaseService.addNewNoteToDB(notes, user)
             if(result){
                 _addNewNoteStatus.value = result
             }
         }
     }
 
-    fun updateNotes(notes: NotesKey){
+    fun updateNotes(notes: NotesKey, user: User){
         viewModelScope.launch {
-            var status = DatabaseService.updateNewNoteInDB(notes)
+            var cal = Calendar.getInstance()
+            notes.dateModified = cal.time
+            var status = DatabaseService.updateNewNoteInDB(notes,user)
             if (status){
                 _updateNoteStatus.value = status
             }
         }
     }
 
-    fun deleteNotes(notes: NotesKey){
+    fun deleteNotes(notes: NotesKey, user: User){
         viewModelScope.launch {
-            var status = DatabaseService.deleteNoteFromDB(notes)
+            var cal = Calendar.getInstance()
+            notes.dateModified = cal.time
+            var status = DatabaseService.deleteNoteFromDB(notes, user)
             if(status){
                 _deleteNoteStatus.value = status
+            }
+        }
+    }
+
+    fun getUserInfo(uid: Long){
+        viewModelScope.launch {
+            var userData = DatabaseService.getFromDatabase(uid)
+            if(userData != null){
+                _userDataStatus.postValue(userData)
             }
         }
     }

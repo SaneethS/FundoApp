@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yml.fundo.data.wrapper.User
 import com.yml.fundo.auth.Authentication
+import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.service.DatabaseService
 import kotlinx.coroutines.launch
 
@@ -18,8 +19,12 @@ class RegisterViewModel: ViewModel() {
         Authentication.registerEmailPassword(user.email, password){
             if(it?.loginStatus == true){
                 viewModelScope.launch{
-                    DatabaseService.setToDatabase(user)
-                    _registerStatus.value = it.loginStatus
+                    val newUser = User(user.name, user.email, user.mobileNo, it.fUid)
+                    var user =DatabaseService.setNewUserToDatabase(newUser)
+                    if(user != null){
+                        SharedPref.addUid(user.uid)
+                        _registerStatus.value = it.loginStatus
+                    }
                 }
             }else{
                 _registerStatus.value = it?.loginStatus

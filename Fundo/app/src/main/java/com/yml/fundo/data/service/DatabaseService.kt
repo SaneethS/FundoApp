@@ -1,40 +1,80 @@
 package com.yml.fundo.data.service
 
+import android.content.Context
+import android.util.Log
 import com.yml.fundo.data.model.Notes
 import com.yml.fundo.data.wrapper.User
-import com.yml.fundo.data.model.NotesKey
+import com.yml.fundo.data.wrapper.NotesKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object DatabaseService {
+    private lateinit var sqlDb: SqLiteDatabase
 
-    suspend fun setToDatabase(user: User){
-        withContext(Dispatchers.IO){
-            try{
-                FirebaseDatabase.setToDatabase(user)
-            }catch (e:Exception){
-                e.printStackTrace()
-            }
-
-        }
+    fun initSqliteDBService(context: Context) {
+        sqlDb = SqLiteDatabase(context)
     }
 
-    suspend fun getFromDatabase(){
-        withContext(Dispatchers.IO){
+    suspend fun setToDatabase(user: User): User? {
+        return withContext(Dispatchers.IO) {
             try {
-                FirebaseDatabase.getFromDatabase()
-            }catch (e:Exception){
+                val userFirebase = FirebaseDatabase.getFromDatabase(user.fUid)
+                val userSql = sqlDb.setToDatabase(userFirebase)
+//                FirebaseDatabase.setToDatabase(user)
+                userSql
+            } catch (e: Exception) {
                 e.printStackTrace()
+                null
             }
         }
     }
 
-    suspend fun addNewNoteToDB(notes: Notes):Boolean{
+    suspend fun setNewUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO){
+            try{
+                val userFirebase = FirebaseDatabase.setToDatabase(user)
+//                val userFirebase = FirebaseDatabase.getFromDatabase(user.fUid)
+                val userSql = sqlDb.setToDatabase(userFirebase!!)
+                userSql
+            }catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    suspend fun getFromDatabase(uid: Long): User? {
+        return withContext(Dispatchers.IO) {
             try {
-                FirebaseDatabase.addNewNoteToDB(notes)
+                sqlDb.getFromDatabase(uid)
+//                FirebaseDatabase.getFromDatabase()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    suspend fun addCloudDataToLocalDB(user: User) : Boolean {
+        return withContext(Dispatchers.IO){
+            val noteListFromCloud = FirebaseDatabase.getNewNoteFromDB(user)
+            if (noteListFromCloud != null) {
+                for( i in noteListFromCloud){
+                    sqlDb.addNewNoteToDB(i)
+                }
+            }
+            true
+        }
+    }
+
+    suspend fun addNewNoteToDB(notes: NotesKey, user: User): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                var note = FirebaseDatabase.addNewNoteToDB(notes,user)
+                sqlDb.addNewNoteToDB(note)
+
                 true
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 false
             }
@@ -42,12 +82,13 @@ object DatabaseService {
         }
     }
 
-    suspend fun getNewNoteFromDB():ArrayList<NotesKey>?{
-        return withContext(Dispatchers.IO){
+    suspend fun getNewNoteFromDB(): ArrayList<NotesKey>? {
+        return withContext(Dispatchers.IO) {
             try {
-                var notesList = FirebaseDatabase.getNewNoteFromDB()
+                var notesList = sqlDb.getNewNoteFromDB()
+//                var notesList = FirebaseDatabase.getNewNoteFromDB()
                 notesList
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 null
             }
@@ -55,12 +96,13 @@ object DatabaseService {
 
     }
 
-    suspend fun updateNewNoteInDB(notes: NotesKey):Boolean{
-        return withContext(Dispatchers.IO){
+    suspend fun updateNewNoteInDB(notes: NotesKey, user: User): Boolean {
+        return withContext(Dispatchers.IO) {
             try {
-                FirebaseDatabase.updateNewNoteInDB(notes)
+                sqlDb.updateNewNoteInDB(notes)
+                FirebaseDatabase.updateNewNoteInDB(notes, user)
                 true
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 false
             }
@@ -69,12 +111,13 @@ object DatabaseService {
 
     }
 
-    suspend fun deleteNoteFromDB(notes: NotesKey):Boolean{
-        return withContext(Dispatchers.IO){
+    suspend fun deleteNoteFromDB(notes: NotesKey, user: User): Boolean {
+        return withContext(Dispatchers.IO) {
             try {
-                FirebaseDatabase.deleteNoteFromDB(notes)
+                sqlDb.deleteNoteFromDB(notes)
+                FirebaseDatabase.deleteNoteFromDB(notes, user)
                 true
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 false
             }

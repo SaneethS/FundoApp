@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -23,8 +24,10 @@ import com.yml.fundo.R
 import com.yml.fundo.ui.home.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
 import com.yml.fundo.common.SharedPref
+import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.ui.activity.SharedViewModel
-import com.yml.fundo.data.model.NotesKey
+import com.yml.fundo.data.wrapper.NotesKey
+import com.yml.fundo.data.wrapper.User
 import com.yml.fundo.ui.note.NotePage
 
 class HomePage:Fragment(R.layout.home_page) {
@@ -37,12 +40,14 @@ class HomePage:Fragment(R.layout.home_page) {
     lateinit var recyclerView: RecyclerView
     lateinit var myAdapter: MyAdapter
     var menu: Menu? = null
+    private var userId:Long = 0L
 
     companion object {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
         var notesList = ArrayList<NotesKey>()
         var searchList = ArrayList<NotesKey>()
+        var currentUser: User = User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -59,7 +64,13 @@ class HomePage:Fragment(R.layout.home_page) {
         (requireActivity() as AppCompatActivity).supportActionBar?.show()
         setHasOptionsMenu(true)
 
+        userId = SharedPref.getId()
+
+        Log.i("Home", "$userId")
+        homeViewModel.getUserInfo(userId)
         profilePage()
+        userData()
+        setUserDetails()
 
         binding.homeFab.setOnClickListener {
             sharedViewModel.setGoToNotePageStatus(true)
@@ -79,14 +90,32 @@ class HomePage:Fragment(R.layout.home_page) {
         noteClick()
     }
 
+    private fun userData() {
+        homeViewModel.userDataStatus.observe(viewLifecycleOwner){
+            currentUser = it
+            setUserDetails()
+        }
+    }
+
+    private fun setUserDetails() {
+        val name: TextView = dialogView.findViewById(R.id.dialog_name)
+        val email: TextView = dialogView.findViewById(R.id.dialog_email)
+
+        name.text = currentUser.name
+        email.text = currentUser.email
+    }
+
     private fun noteClick() {
         myAdapter.setOnItemClickListener(object : MyAdapter.OnItemClickListener{
             override fun onItemClick(position: Int) {
                 var note = searchList[position]
                 var bundle = Bundle()
+                var dateTime = DateTypeConverter().fromOffsetDateTime(note.dateModified)
                 bundle.putString("title", note.title)
                 bundle.putString("notes", note.content)
                 bundle.putString("key",note.key)
+                bundle.putLong("id",note.id)
+                bundle.putString("dateModified",dateTime)
                 var notePage = NotePage()
                 notePage.arguments = bundle
                 requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_view, notePage).commit()
@@ -220,7 +249,7 @@ class HomePage:Fragment(R.layout.home_page) {
         homeViewModel.getUserAvatar()
         val logout: MaterialButton = dialogView.findViewById(R.id.dialog_logout)
         logout.setOnClickListener {
-            homeViewModel.logoutFromHome()
+            homeViewModel.logoutFromHome(requireContext())
             dismissDialog()
             sharedViewModel.setGoToLoginPageStatus(true)
         }
@@ -230,13 +259,13 @@ class HomePage:Fragment(R.layout.home_page) {
             dismissDialog()
         }
 
-        val name: TextView = dialogView.findViewById(R.id.dialog_name)
-        val email: TextView = dialogView.findViewById(R.id.dialog_email)
-        val mobile: TextView = dialogView.findViewById(R.id.dialog_mobile)
-
-        name.text = SharedPref.get("userName")
-        email.text = SharedPref.get("userEmail")
-        mobile.text = SharedPref.get("userMobile")
+//        val name: TextView = dialogView.findViewById(R.id.dialog_name)
+//        val email: TextView = dialogView.findViewById(R.id.dialog_email)
+//        val mobile: TextView = dialogView.findViewById(R.id.dialog_mobile)
+//
+//        name.text = SharedPref.get("userName")
+//        email.text = SharedPref.get("userEmail")
+//        mobile.text = SharedPref.get("userMobile")
 
         val profileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
         profileIcon.setOnClickListener {

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yml.fundo.R
-import com.yml.fundo.data.model.NotesKey
+import com.yml.fundo.data.wrapper.NotesKey
 
 class MyAdapter(private val notesList: ArrayList<NotesKey>):RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
