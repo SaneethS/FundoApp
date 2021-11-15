@@ -2,11 +2,15 @@ package com.yml.fundo.data.service
 
 import android.content.Context
 import com.yml.fundo.auth.Authentication
+import com.yml.fundo.common.CREATE_OP_CODE
+import com.yml.fundo.common.DELETE_OP_CODE
+import com.yml.fundo.common.UPDATE_OP_CODE
 import com.yml.fundo.common.Util
 import com.yml.fundo.data.model.Notes
 import com.yml.fundo.data.model.UserDetails
 import com.yml.fundo.data.room.database.LocalDatabase
 import com.yml.fundo.data.room.entity.NotesEntity
+import com.yml.fundo.data.room.entity.OperationEntity
 import com.yml.fundo.data.room.entity.UserEntity
 import com.yml.fundo.data.wrapper.NotesKey
 import com.yml.fundo.data.wrapper.User
@@ -47,7 +51,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun addNewNoteToDB(notesKey: NotesKey): NotesKey {
+    suspend fun addNewNoteToDB(notesKey: NotesKey, onlineStatus:Boolean = true): NotesKey {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notesKey.key,
@@ -57,6 +61,10 @@ class SqLiteDatabase(context: Context) {
                 nid = notesKey.id
             )
             notesKey.id = notesDao.addNewNoteToDB(noteEntity)
+            if(!onlineStatus){
+                val opEntity = OperationEntity(notesKey.key, CREATE_OP_CODE)
+                operationDao.addOp(opEntity)
+            }
             notesKey
         }
     }
@@ -74,25 +82,51 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun updateNewNoteInDB(notes: NotesKey): Boolean {
+    suspend fun updateNewNoteInDB(notes: NotesKey, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
                 dateModified = notes.dateModified, nid = notes.id
             )
             notesDao.updateNewNoteInDB(noteEntity)
+            if(!onlineStatus){
+                val opEntity = OperationEntity(notes.key, UPDATE_OP_CODE)
+                operationDao.addOp(opEntity)
+            }
             true
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: NotesKey): Boolean {
+    suspend fun deleteNoteFromDB(notes: NotesKey, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
                 dateModified = notes.dateModified, nid = notes.id
             )
             notesDao.deleteNoteFromDB(noteEntity)
+            if(!onlineStatus){
+                if(notes.key.isNotEmpty()){
+                    val opEntity = OperationEntity(notes.key, DELETE_OP_CODE)
+                    operationDao.addOp(opEntity)
+                }
+            }
             true
         }
+    }
+
+    suspend fun getOpCode(note: NotesKey): Int{
+        return withContext(Dispatchers.IO){
+            val opc = operationDao.getOpCode(note.key)
+            if(opc != null){
+                return@withContext opc.opCode
+            }else{
+                return@withContext -1
+            }
+        }
+    }
+
+    suspend fun clearNoteAndOperation(){
+        notesDao.deleteNoteTable()
+        operationDao.deleteOp()
     }
 }

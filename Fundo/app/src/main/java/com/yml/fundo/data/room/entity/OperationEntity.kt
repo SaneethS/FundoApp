@@ -4,15 +4,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "operation_table",
-        foreignKeys = [ForeignKey(entity = NotesEntity::class,
-                        parentColumns = arrayOf("nid"),
-                        childColumns = arrayOf("nid"),
-                        onDelete = ForeignKey.CASCADE
-
-        )]
-)
+@Entity(tableName = "operation_table")
 data class OperationEntity(
-    @PrimaryKey var nid: Long,
-    var opCode: Int
+    @PrimaryKey val fNid: String,
+    val opCode: Int
 )

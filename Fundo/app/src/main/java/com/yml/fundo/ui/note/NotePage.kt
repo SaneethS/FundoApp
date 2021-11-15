@@ -24,7 +24,7 @@ class NotePage: Fragment(R.layout.note_page) {
     lateinit var noteViewModel: NoteViewModel
     var noteTitle:String? = null
     var noteContent:String? = null
-    var noteKey:String? = null
+    var noteKey:String = ""
     var bundleDateModified: Date? = null
     var bundleNoteId:Long? = null
     private var userId:Long = 0L
@@ -90,8 +90,8 @@ class NotePage: Fragment(R.layout.note_page) {
         var title = binding.titleText.text.toString()
         var content = binding.noteText.text.toString()
         if(title.isNotEmpty() || content.isNotEmpty()){
-            var note = NotesKey(title, content, dateModified = bundleDateModified,noteKey!!,bundleNoteId!!)
-            noteViewModel.deleteNotes(note, currentUser)
+            var note = NotesKey(title, content, dateModified = bundleDateModified,noteKey,bundleNoteId!!)
+            noteViewModel.deleteNotes(requireContext(),note, currentUser)
         }else{
             Toast.makeText(requireContext(),getString(R.string.deletion_not_posssible_toast),Toast.LENGTH_LONG).show()
         }
@@ -101,7 +101,7 @@ class NotePage: Fragment(R.layout.note_page) {
         val dateTime = DateTypeConverter().toOffsetDateTime(arguments?.getString("dateModified"))
         noteTitle = arguments?.getString("title")
         noteContent = arguments?.getString("notes")
-        noteKey = arguments?.getString("key")
+        noteKey = arguments?.getString("key").toString()
         bundleDateModified = dateTime
         bundleNoteId = arguments?.getLong("id")
         Log.i("BundleKey","$bundleNoteId")
@@ -115,10 +115,10 @@ class NotePage: Fragment(R.layout.note_page) {
         if(bundleNoteId == null) {
             var notes = NotesKey(title, content, dateModified = null)
             Log.i("NoteCurrent","$currentUser")
-            noteViewModel.addNewNote(notes, currentUser)
+            noteViewModel.addNewNote(requireContext(),notes, currentUser)
         }else{
-            var note = NotesKey(title, content, dateModified = bundleDateModified,noteKey!!, bundleNoteId!!)
-            noteViewModel.updateNotes(note, currentUser)
+            var note = NotesKey(title, content, dateModified = bundleDateModified,noteKey, bundleNoteId!!)
+            noteViewModel.updateNotes(requireContext(),note, currentUser)
             Toast.makeText(requireContext(),getString(R.string.updated_successfully_toast),Toast.LENGTH_LONG).show()
         }
     }

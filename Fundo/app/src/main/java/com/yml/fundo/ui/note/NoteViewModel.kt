@@ -1,5 +1,6 @@
 package com.yml.fundo.ui.note
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,33 +25,33 @@ class NoteViewModel: ViewModel() {
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
 
-    fun addNewNote(notes: NotesKey, user: User){
+    fun addNewNote(context: Context,notes: NotesKey, user: User){
         viewModelScope.launch {
             var cal = Calendar.getInstance()
             notes.dateModified = cal.time
-            var result = DatabaseService.addNewNoteToDB(notes, user)
+            var result = DatabaseService.addNewNoteToDB(context,notes, user)
             if(result){
                 _addNewNoteStatus.value = result
             }
         }
     }
 
-    fun updateNotes(notes: NotesKey, user: User){
+    fun updateNotes(context: Context,notes: NotesKey, user: User){
         viewModelScope.launch {
             var cal = Calendar.getInstance()
             notes.dateModified = cal.time
-            var status = DatabaseService.updateNewNoteInDB(notes,user)
+            var status = DatabaseService.updateNewNoteInDB(context,notes,user)
             if (status){
                 _updateNoteStatus.value = status
             }
         }
     }
 
-    fun deleteNotes(notes: NotesKey, user: User){
+    fun deleteNotes(context: Context,notes: NotesKey, user: User){
         viewModelScope.launch {
             var cal = Calendar.getInstance()
             notes.dateModified = cal.time
-            var status = DatabaseService.deleteNoteFromDB(notes, user)
+            var status = DatabaseService.deleteNoteFromDB(context,notes, user)
             if(status){
                 _deleteNoteStatus.value = status
             }

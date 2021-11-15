@@ -7,9 +7,10 @@ import com.yml.fundo.data.room.dao.NotesDao
 import com.yml.fundo.data.room.dao.OperationDao
 import com.yml.fundo.data.room.dao.UserDao
 import com.yml.fundo.data.room.entity.NotesEntity
+import com.yml.fundo.data.room.entity.OperationEntity
 import com.yml.fundo.data.room.entity.UserEntity
 
-@Database(entities = [UserEntity::class, NotesEntity::class],version = 1,exportSchema = false)
+@Database(entities = [UserEntity::class, NotesEntity::class, OperationEntity::class],version = 1,exportSchema = false)
 @TypeConverters(DateTypeConverter::class)
 abstract class LocalDatabase: RoomDatabase() {
 

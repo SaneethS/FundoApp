@@ -54,7 +54,8 @@ object FirebaseDatabase {
     }
 
     suspend fun addNewNoteToDB(notes: NotesKey, user: User): NotesKey {
-        var notesInfo = Notes(notes.title, notes.content, notes.dateModified)
+        var dateTime = DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
+        var notesInfo = Notes(notes.title, notes.content, dateTime)
         return suspendCoroutine { callback ->
             Log.i("NoteFB","${user.fUid}")
             val ref = database.child("note").child(user.fUid).push()
@@ -82,7 +83,8 @@ object FirebaseDatabase {
                             val dateTime = DateTypeConverter().toOffsetDateTime(dateModified)
                             var note = NotesKey(
                                 item.child("title").value.toString(),
-                                item.child("content").value.toString(), dateModified = dateTime,
+                                item.child("content").value.toString(),
+                                dateModified = dateTime,
                                 item.key.toString()
                             )
                             noteList.add(note)
@@ -102,7 +104,7 @@ object FirebaseDatabase {
         val notesMap = mapOf(
             "title" to notes.title,
             "content" to notes.content,
-            "dateModified" to notes.dateModified
+            "dateModified" to DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
         )
         return suspendCoroutine { callback ->
             database.child("note").child(user.fUid).child(notes.key).updateChildren(notesMap)

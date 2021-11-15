@@ -25,10 +25,15 @@ import com.yml.fundo.ui.home.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.room.DateTypeConverter
+import com.yml.fundo.data.service.SyncDatabase
 import com.yml.fundo.ui.activity.SharedViewModel
 import com.yml.fundo.data.wrapper.NotesKey
 import com.yml.fundo.data.wrapper.User
 import com.yml.fundo.ui.note.NotePage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class HomePage:Fragment(R.layout.home_page) {
     lateinit var binding: HomePageBinding
@@ -76,6 +81,23 @@ class HomePage:Fragment(R.layout.home_page) {
             sharedViewModel.setGoToNotePageStatus(true)
         }
 
+//        binding.reloadFab.setOnClickListener {
+//            Toast.makeText(requireContext(),"Sync Success",Toast.LENGTH_LONG).show()
+//            CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                SyncDatabase.syncNow(currentUser)
+//                } catch (e:Exception){
+//                    e.printStackTrace()
+//                }
+//            }
+//        }
+
+        binding.swipeRefreshView.setOnRefreshListener {
+            homeViewModel.syncData(currentUser)
+        }
+
+        refreshNotes()
+
         homeViewModel.userAvatarStatus.observe(viewLifecycleOwner) {
             val userProfileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
             userProfileIcon.setImageBitmap(it)
@@ -88,6 +110,13 @@ class HomePage:Fragment(R.layout.home_page) {
 
         myRecyclerView()
         noteClick()
+    }
+
+    private fun refreshNotes() {
+        homeViewModel.syncDataStatus.observe(viewLifecycleOwner){
+            homeViewModel.getNewNotes()
+            binding.swipeRefreshView.isRefreshing = false
+        }
     }
 
     private fun userData() {
@@ -259,13 +288,6 @@ class HomePage:Fragment(R.layout.home_page) {
             dismissDialog()
         }
 
-//        val name: TextView = dialogView.findViewById(R.id.dialog_name)
-//        val email: TextView = dialogView.findViewById(R.id.dialog_email)
-//        val mobile: TextView = dialogView.findViewById(R.id.dialog_mobile)
-//
-//        name.text = SharedPref.get("userName")
-//        email.text = SharedPref.get("userEmail")
-//        mobile.text = SharedPref.get("userMobile")
 
         val profileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
         profileIcon.setOnClickListener {

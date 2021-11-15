@@ -80,7 +80,7 @@ class LoginPage:Fragment(R.layout.login_page) {
             }
 
             override fun onSuccess(result: LoginResult) {
-                loginViewModel.facebookLoginWithUser(result.accessToken)
+                loginViewModel.facebookLoginWithUser(requireContext(),result.accessToken)
 
             }
 
@@ -91,7 +91,7 @@ class LoginPage:Fragment(R.layout.login_page) {
         var email = binding.usernameField
         var password = binding.passwordField
         if(Validator.loginValidation(email,password,requireContext())){
-            loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
+            loginViewModel.loginWithEmailAndPassword(requireContext(),email.text.toString(),password.text.toString())
         }else{
             loading.dismiss()
         }

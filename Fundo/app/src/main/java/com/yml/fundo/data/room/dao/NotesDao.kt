@@ -17,4 +17,7 @@ interface NotesDao {
 
     @Delete
     suspend fun deleteNoteFromDB(note: NotesEntity)
+
+    @Query("Delete from notes")
+    suspend fun deleteNoteTable()
 }

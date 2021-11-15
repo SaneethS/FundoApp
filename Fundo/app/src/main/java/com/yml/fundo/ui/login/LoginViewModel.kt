@@ -1,5 +1,6 @@
 package com.yml.fundo.ui.login
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,14 +20,14 @@ class LoginViewModel: ViewModel() {
     private val _facebookLoginStatus = MutableLiveData<User>()
     val facebookLoginStatus = _facebookLoginStatus as LiveData<User>
 
-    fun loginWithEmailAndPassword(email: String, password: String){
+    fun loginWithEmailAndPassword(context: Context,email: String, password: String){
         Authentication.loginEmailPassword(email, password){user->
             viewModelScope.launch {
                 if (user != null) {
-                    var userDet =DatabaseService.setToDatabase(user)
+                    var userDet =DatabaseService.setToDatabase(context,user)
                     if(userDet != null){
                         SharedPref.addUid(userDet.uid)
-                        DatabaseService.addCloudDataToLocalDB(userDet)
+                        DatabaseService.addCloudDataToLocalDB(context,userDet)
                         Log.i("Login","${userDet.uid}")
                         _loginStatus.value = userDet
                     }
@@ -35,14 +36,14 @@ class LoginViewModel: ViewModel() {
         }
     }
 
-    fun facebookLoginWithUser(accessToken: AccessToken){
+    fun facebookLoginWithUser(context: Context,accessToken: AccessToken){
         Authentication.signInWithFacebook(accessToken){user->
             viewModelScope.launch {
                 if (user != null) {
-                    var userDet = DatabaseService.setNewUserToDatabase(user)
+                    var userDet = DatabaseService.setNewUserToDatabase(context,user)
                     if(userDet != null){
                         SharedPref.addUid(user.uid)
-                        DatabaseService.addCloudDataToLocalDB(userDet)
+                        DatabaseService.addCloudDataToLocalDB(context,userDet)
                         _facebookLoginStatus.value = userDet
                     }
                 }

@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity() {
                 super.onDrawerOpened(drawerView)
                 val header = binding.navigationDrawer.getHeaderView(0)
                 val headerText:TextView = header.findViewById(R.id.drawer_name_text)
-                headerText.text = SharedPref.get("userName")
             }
         }
         binding.drawerLayout.addDrawerListener(toggle)

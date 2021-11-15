@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.yml.fundo.auth.Authentication
 import com.yml.fundo.data.service.DatabaseService
 import com.yml.fundo.data.service.Storage
+import com.yml.fundo.data.service.SyncDatabase
 import com.yml.fundo.data.wrapper.NotesKey
 import com.yml.fundo.data.wrapper.User
 import kotlinx.coroutines.launch
@@ -23,6 +24,9 @@ class HomeViewModel: ViewModel() {
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
+
+    private val _syncDataStatus = MutableLiveData<Boolean>()
+    val syncDataStatus = _syncDataStatus as LiveData<Boolean>
 
     fun logoutFromHome(context: Context){
         viewModelScope.launch {
@@ -69,6 +73,13 @@ class HomeViewModel: ViewModel() {
             if(userData != null){
                 _userDataStatus.postValue(userData)
             }
+        }
+    }
+
+    fun syncData(user: User){
+        viewModelScope.launch {
+            SyncDatabase.syncNow(user)
+            _syncDataStatus.postValue(true)
         }
     }
 }

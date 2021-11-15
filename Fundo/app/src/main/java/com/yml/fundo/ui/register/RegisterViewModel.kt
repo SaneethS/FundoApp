@@ -1,5 +1,6 @@
 package com.yml.fundo.ui.register
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,12 +16,12 @@ class RegisterViewModel: ViewModel() {
     private val _registerStatus = MutableLiveData<Boolean>()
     val registerStatus = _registerStatus as LiveData<Boolean>
 
-    fun registerNewUser(user: User, password: String){
+    fun registerNewUser(context: Context,user: User, password: String){
         Authentication.registerEmailPassword(user.email, password){
             if(it?.loginStatus == true){
                 viewModelScope.launch{
                     val newUser = User(user.name, user.email, user.mobileNo, it.fUid)
-                    var user =DatabaseService.setNewUserToDatabase(newUser)
+                    var user =DatabaseService.setNewUserToDatabase(context,newUser)
                     if(user != null){
                         SharedPref.addUid(user.uid)
                         _registerStatus.value = it.loginStatus
