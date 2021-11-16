@@ -5,15 +5,12 @@ import com.yml.fundo.auth.Authentication
 import com.yml.fundo.common.CREATE_OP_CODE
 import com.yml.fundo.common.DELETE_OP_CODE
 import com.yml.fundo.common.UPDATE_OP_CODE
-import com.yml.fundo.common.Util
-import com.yml.fundo.data.model.Notes
-import com.yml.fundo.data.model.UserDetails
 import com.yml.fundo.data.room.database.LocalDatabase
 import com.yml.fundo.data.room.entity.NotesEntity
 import com.yml.fundo.data.room.entity.OperationEntity
 import com.yml.fundo.data.room.entity.UserEntity
-import com.yml.fundo.data.wrapper.NotesKey
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -51,30 +48,30 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun addNewNoteToDB(notesKey: NotesKey, onlineStatus:Boolean = true): NotesKey {
+    suspend fun addNewNoteToDB(notes: Notes, onlineStatus:Boolean = true): Notes {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
-                fNid = notesKey.key,
-                title = notesKey.title,
-                content = notesKey.content,
-                dateModified = notesKey.dateModified,
-                nid = notesKey.id
+                fNid = notes.key,
+                title = notes.title,
+                content = notes.content,
+                dateModified = notes.dateModified,
+                nid = notes.id
             )
-            notesKey.id = notesDao.addNewNoteToDB(noteEntity)
+            notes.id = notesDao.addNewNoteToDB(noteEntity)
             if(!onlineStatus){
-                val opEntity = OperationEntity(notesKey.key, CREATE_OP_CODE)
+                val opEntity = OperationEntity(notes.key, CREATE_OP_CODE)
                 operationDao.addOp(opEntity)
             }
-            notesKey
+            notes
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<NotesKey>{
+    suspend fun getNewNoteFromDB(): ArrayList<Notes>{
         return withContext(Dispatchers.IO){
             val notesEntity = notesDao.getNewNoteFromDB()
-            val notesList = arrayListOf<NotesKey>()
+            val notesList = arrayListOf<Notes>()
             for (i in notesEntity){
-                val notesKey = NotesKey(title = i.title, content = i.content,
+                val notesKey = Notes(title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid)
                 notesList.add(notesKey)
             }
@@ -82,7 +79,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun updateNewNoteInDB(notes: NotesKey, onlineStatus: Boolean = true): Boolean {
+    suspend fun updateNewNoteInDB(notes: Notes, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
@@ -97,7 +94,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: NotesKey, onlineStatus: Boolean = true): Boolean {
+    suspend fun deleteNoteFromDB(notes: Notes, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
@@ -114,7 +111,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getOpCode(note: NotesKey): Int{
+    suspend fun getOpCode(note: Notes): Int{
         return withContext(Dispatchers.IO){
             val opc = operationDao.getOpCode(note.key)
             if(opc != null){
@@ -128,5 +125,9 @@ class SqLiteDatabase(context: Context) {
     suspend fun clearNoteAndOperation(){
         notesDao.deleteNoteTable()
         operationDao.deleteOp()
+    }
+
+    suspend fun clearAllTables(){
+        localDatabase.clearAllTables()
     }
 }

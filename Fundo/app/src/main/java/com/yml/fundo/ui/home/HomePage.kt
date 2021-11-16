@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.widget.SearchView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,34 +26,30 @@ import com.yml.fundo.ui.home.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.room.DateTypeConverter
-import com.yml.fundo.data.service.SyncDatabase
-import com.yml.fundo.ui.activity.SharedViewModel
-import com.yml.fundo.data.wrapper.NotesKey
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.SharedViewModel
+import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.ui.note.NotePage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.lang.Exception
 
-class HomePage:Fragment(R.layout.home_page) {
-    lateinit var binding: HomePageBinding
-    lateinit var sharedViewModel: SharedViewModel
-    lateinit var homeViewModel: HomeViewModel
-    lateinit var alertDialog: AlertDialog
-    lateinit var loading: Dialog
-    lateinit var dialogView: View
-    lateinit var recyclerView: RecyclerView
-    lateinit var myAdapter: MyAdapter
-    var menu: Menu? = null
-    private var userId:Long = 0L
+class HomePage : Fragment(R.layout.home_page) {
+    private lateinit var binding: HomePageBinding
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var alertDialog: AlertDialog
+    private lateinit var loading: Dialog
+    private lateinit var dialogView: View
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var myAdapter: MyAdapter
+    private var menu: Menu? = null
+    private var userId: Long = 0L
 
     companion object {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
-        var notesList = ArrayList<NotesKey>()
-        var searchList = ArrayList<NotesKey>()
-        var currentUser: User = User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
+        private var notesList = ArrayList<Notes>()
+//        private var searchList = ArrayList<Notes>()
+        private var currentUser: User =
+            User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -72,28 +69,13 @@ class HomePage:Fragment(R.layout.home_page) {
         userId = SharedPref.getId()
 
         Log.i("Home", "$userId")
-        homeViewModel.getUserInfo(userId)
+        homeViewModel.getUserInfo(requireContext(), userId)
         profilePage()
         userData()
         setUserDetails()
 
         binding.homeFab.setOnClickListener {
             sharedViewModel.setGoToNotePageStatus(true)
-        }
-
-//        binding.reloadFab.setOnClickListener {
-//            Toast.makeText(requireContext(),"Sync Success",Toast.LENGTH_LONG).show()
-//            CoroutineScope(Dispatchers.IO).launch {
-//            try {
-//                SyncDatabase.syncNow(currentUser)
-//                } catch (e:Exception){
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-
-        binding.swipeRefreshView.setOnRefreshListener {
-            homeViewModel.syncData(currentUser)
         }
 
         refreshNotes()
@@ -113,14 +95,18 @@ class HomePage:Fragment(R.layout.home_page) {
     }
 
     private fun refreshNotes() {
-        homeViewModel.syncDataStatus.observe(viewLifecycleOwner){
-            homeViewModel.getNewNotes()
+        binding.swipeRefreshView.setOnRefreshListener {
+            homeViewModel.syncData(requireContext(), currentUser)
+        }
+
+        homeViewModel.syncDataStatus.observe(viewLifecycleOwner) {
+            homeViewModel.getNewNotes(requireContext())
             binding.swipeRefreshView.isRefreshing = false
         }
     }
 
     private fun userData() {
-        homeViewModel.userDataStatus.observe(viewLifecycleOwner){
+        homeViewModel.userDataStatus.observe(viewLifecycleOwner) {
             currentUser = it
             setUserDetails()
         }
@@ -135,37 +121,36 @@ class HomePage:Fragment(R.layout.home_page) {
     }
 
     private fun noteClick() {
-        myAdapter.setOnItemClickListener(object : MyAdapter.OnItemClickListener{
+        myAdapter.setOnItemClickListener(object : MyAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                var note = searchList[position]
-                var bundle = Bundle()
-                var dateTime = DateTypeConverter().fromOffsetDateTime(note.dateModified)
+                val note = notesList[position]
+                val bundle = Bundle()
+                val dateTime = DateTypeConverter().fromOffsetDateTime(note.dateModified)
                 bundle.putString("title", note.title)
                 bundle.putString("notes", note.content)
-                bundle.putString("key",note.key)
-                bundle.putLong("id",note.id)
-                bundle.putString("dateModified",dateTime)
-                var notePage = NotePage()
+                bundle.putString("key", note.key)
+                bundle.putLong("id", note.id)
+                bundle.putString("dateModified", dateTime)
+                val notePage = NotePage()
                 notePage.arguments = bundle
-                requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragment_view, notePage).commit()
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_view, notePage).commit()
             }
 
         })
     }
 
     private fun myRecyclerView() {
-        myAdapter = MyAdapter(searchList)
+        myAdapter = MyAdapter(notesList)
         recyclerView = binding.recyclerView
-        recyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = myAdapter
-        homeViewModel.getNewNotes()
+        homeViewModel.getNewNotes(requireContext())
 
-        homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner){
+        homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
-            searchList.clear()
-            searchList.addAll(it)
             myAdapter.notifyDataSetChanged()
         }
     }
@@ -195,7 +180,7 @@ class HomePage:Fragment(R.layout.home_page) {
                     requireContext(),
                     getString(R.string.storage_access_required_toast),
                     Toast.LENGTH_LONG
-                )
+                ).show()
             }
         }
     }
@@ -210,52 +195,38 @@ class HomePage:Fragment(R.layout.home_page) {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        var itemView = item.itemId
 
-        when (itemView) {
+        when (item.itemId) {
             R.id.profile_icon -> showDialog()
         }
         return false
     }
 
-    private fun changeNotesLayout(){
-        var toggleView = menu?.getItem(1)
-        var view = toggleView?.actionView
-        var viewSelector = view?.findViewById<AppCompatToggleButton>(R.id.toggle_button)
-        viewSelector?.setOnCheckedChangeListener{ _,isChecked ->
-            if(isChecked){
+    private fun changeNotesLayout() {
+        val toggleView = menu?.getItem(1)
+        val view = toggleView?.actionView
+        val viewSelector = view?.findViewById<AppCompatToggleButton>(R.id.toggle_button)
+        viewSelector?.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
                 recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            }else{
-                recyclerView.layoutManager = StaggeredGridLayoutManager(2,1)
+            } else {
+                recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
             }
 
         }
     }
 
-    private fun searchNotes(){
+    private fun searchNotes() {
         val searchItem = menu?.getItem(0)
         val searchView = searchItem?.actionView as SearchView
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                searchList.clear()
-                var searchText = newText!!.lowercase()
-                if(searchText.isNotEmpty()){
-                    notesList.forEach {
-                        if(it.title.lowercase().contains(searchText) || it.content.lowercase().contains(searchText)){
-                            searchList.add(it)
-                        }
-                    }
-                    myAdapter.notifyDataSetChanged()
-                }else{
-                    searchList.clear()
-                    searchList.addAll(notesList)
-                    myAdapter.notifyDataSetChanged()
-                }
+                myAdapter.filter.filter(newText)
                 return false
             }
 
@@ -293,8 +264,11 @@ class HomePage:Fragment(R.layout.home_page) {
         profileIcon.setOnClickListener {
             if (requireActivity().checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 pickImage()
-            }else{
-                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_RESULTCODE)
+            } else {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                    STORAGE_PERMISSION_RESULTCODE
+                )
             }
         }
     }
@@ -302,11 +276,6 @@ class HomePage:Fragment(R.layout.home_page) {
     private fun pickImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_RESULTCODE)
-    }
-
-    fun syncList(){
-        searchList.clear()
-        searchList.addAll(notesList)
     }
 
 }

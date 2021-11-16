@@ -1,4 +1,4 @@
-package com.yml.fundo.data.wrapper
+package com.yml.fundo.ui.wrapper
 
 import com.yml.fundo.auth.Authentication
 

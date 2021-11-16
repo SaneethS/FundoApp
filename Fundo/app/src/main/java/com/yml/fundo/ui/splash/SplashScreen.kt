@@ -7,11 +7,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.SplashScreenBinding
 import com.yml.fundo.auth.Authentication
-import com.yml.fundo.ui.activity.SharedViewModel
+import com.yml.fundo.ui.SharedViewModel
 
-class SplashScreen:Fragment(R.layout.splash_screen) {
-    lateinit var binding: SplashScreenBinding
-    lateinit var sharedViewModel: SharedViewModel
+class SplashScreen : Fragment(R.layout.splash_screen) {
+    private lateinit var binding: SplashScreenBinding
+    private lateinit var sharedViewModel: SharedViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = SplashScreenBinding.bind(view)

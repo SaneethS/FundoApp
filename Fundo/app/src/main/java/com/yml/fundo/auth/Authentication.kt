@@ -8,9 +8,9 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.common.SharedPref
-import com.yml.fundo.data.room.database.LocalDatabase
+import com.yml.fundo.data.service.DatabaseService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -99,7 +99,7 @@ object Authentication {
         withContext(Dispatchers.IO){
             SharedPref.clearAll()
             LoginManager.getInstance().logOut()
-            LocalDatabase.getInstance(context).clearAllTables()
+            DatabaseService.getInstance(context).clearAllTables()
             fauth.signOut()
         }
     }

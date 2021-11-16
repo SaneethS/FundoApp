@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fundo">
         <activity
-            android:name="com.yml.fundo.ui.activity.MainActivity"
+            android:name="com.yml.fundo.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

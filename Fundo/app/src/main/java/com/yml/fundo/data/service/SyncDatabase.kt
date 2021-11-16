@@ -1,31 +1,32 @@
 package com.yml.fundo.data.service
 
+import android.content.Context
 import android.util.Log
 import com.yml.fundo.common.DELETE_OP_CODE
-import com.yml.fundo.data.wrapper.NotesKey
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object SyncDatabase {
+class SyncDatabase(val context: Context) {
 
     suspend fun syncNow(user: User){
         val latestNotes = getLatestNotesFromDB(user)
-        DatabaseService.clearNoteAndOperation()
+        DatabaseService.getInstance(context).clearNoteAndOperation()
         latestNotes.forEach{
-            DatabaseService.addNoteToLocalDb(it)
+            DatabaseService.getInstance(context).addNoteToLocalDb(it)
         }
     }
 
-    suspend fun getLatestNotesFromDB(user: User): List<NotesKey>{
+    private suspend fun getLatestNotesFromDB(user: User): List<Notes>{
         return withContext(Dispatchers.IO){
-            val sqlLiteNoteList = DatabaseService.getNewNoteFromDB()
-            val localNotesList = mutableListOf<NotesKey>()
+            val sqlLiteNoteList = DatabaseService.getInstance(context).getNewNoteFromDB()
+            val localNotesList = mutableListOf<Notes>()
             if (sqlLiteNoteList != null) {
                 localNotesList.addAll(sqlLiteNoteList)
             }
-            val firebaseNotesList = DatabaseService.getNewNoteFromCloud(user)
-            val latestNotes = mutableListOf<NotesKey>()
+            val firebaseNotesList = DatabaseService.getInstance(context).getNewNoteFromCloud(user)
+            val latestNotes = mutableListOf<Notes>()
 
             if(firebaseNotesList != null){
                 for(noteF in firebaseNotesList){
@@ -80,18 +81,18 @@ object SyncDatabase {
                 }
                 return@withContext latestNotes
             }else{
-                return@withContext listOf<NotesKey>()
+                return@withContext listOf<Notes>()
             }
         }
     }
 
-    private suspend fun getOpCode(noteL: NotesKey): Int {
+    private suspend fun getOpCode(noteL: Notes): Int {
         return withContext(Dispatchers.IO){
-            return@withContext DatabaseService.getOpCode(noteL)
+            return@withContext DatabaseService.getInstance(context).getOpCode(noteL)
         }
     }
 
-    private fun compareTimeStamp(noteL: NotesKey, noteF: NotesKey): Boolean{
+    private fun compareTimeStamp(noteL: Notes, noteF: Notes): Boolean{
         var localTime = noteL.dateModified
         var cloudTime = noteF.dateModified
         Log.i("SyncDblocal",localTime.toString())

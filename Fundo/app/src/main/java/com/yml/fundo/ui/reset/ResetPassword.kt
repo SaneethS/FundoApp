@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.ResetPasswordBinding
 import com.yml.fundo.common.Validator
-import com.yml.fundo.ui.activity.SharedViewModel
+import com.yml.fundo.ui.SharedViewModel
 
-class ResetPassword: Fragment(R.layout.reset_password) {
-    lateinit var binding: ResetPasswordBinding
-    lateinit var sharedViewModel: SharedViewModel
-    lateinit var resetPasswordViewModel: ResetPasswordViewModel
+class ResetPassword : Fragment(R.layout.reset_password) {
+    private lateinit var binding: ResetPasswordBinding
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var resetPasswordViewModel: ResetPasswordViewModel
 
-    companion object{
+    companion object {
         lateinit var loading: Dialog
     }
 
@@ -34,23 +34,23 @@ class ResetPassword: Fragment(R.layout.reset_password) {
         }
 
         binding.backButton.setOnClickListener {
-           sharedViewModel.setGoToLoginPageStatus(true)
+            sharedViewModel.setGoToLoginPageStatus(true)
         }
 
         resetPasswordObserver()
     }
 
-    fun resetPassword(email: String){
-        if(Validator.forgotPasswordValidator(binding.resetEmail, requireContext())){
+    private fun resetPassword(email: String) {
+        if (Validator.forgotPasswordValidator(binding.resetEmail, requireContext())) {
             resetPasswordViewModel.resetPasswordOfUser(email)
 
         }
     }
 
-    fun resetPasswordObserver(){
-        resetPasswordViewModel.resetPasswordStatus.observe(viewLifecycleOwner){
+    private fun resetPasswordObserver() {
+        resetPasswordViewModel.resetPasswordStatus.observe(viewLifecycleOwner) {
             loading.dismiss()
-            Toast.makeText(requireContext(),it,Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
             sharedViewModel.setGoToLoginPageStatus(true)
         }
     }

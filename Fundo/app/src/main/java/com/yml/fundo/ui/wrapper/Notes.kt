@@ -1,8 +1,8 @@
-package com.yml.fundo.data.wrapper
+package com.yml.fundo.ui.wrapper
 
 import java.util.*
 
-data class NotesKey(
+data class Notes(
     var title: String,
     var content: String,
     var dateModified:Date?,

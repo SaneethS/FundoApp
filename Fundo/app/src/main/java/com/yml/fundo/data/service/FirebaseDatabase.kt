@@ -4,20 +4,19 @@ import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.yml.fundo.auth.Authentication
-import com.yml.fundo.data.model.Notes
-import com.yml.fundo.data.wrapper.User
-import com.yml.fundo.data.model.UserDetails
+import com.yml.fundo.data.model.FirebaseNotes
+import com.yml.fundo.ui.wrapper.User
+import com.yml.fundo.data.model.FirebaseUserDetails
 import com.yml.fundo.common.Util
 import com.yml.fundo.data.room.DateTypeConverter
-import com.yml.fundo.data.wrapper.NotesKey
+import com.yml.fundo.ui.wrapper.Notes
 import kotlin.coroutines.suspendCoroutine
 
 object FirebaseDatabase {
     private var database: DatabaseReference = Firebase.database.reference
 
     suspend fun setToDatabase(user: User): User? {
-        var userDetails = UserDetails(user.name, user.email, user.mobileNo)
+        var userDetails = FirebaseUserDetails(user.name, user.email, user.mobileNo)
         return suspendCoroutine { callback ->
             database.child("users").child(user.fUid)
                 .setValue(userDetails).addOnCompleteListener {
@@ -53,9 +52,9 @@ object FirebaseDatabase {
         }
     }
 
-    suspend fun addNewNoteToDB(notes: NotesKey, user: User): NotesKey {
+    suspend fun addNewNoteToDB(notes: Notes, user: User): Notes {
         var dateTime = DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
-        var notesInfo = Notes(notes.title, notes.content, dateTime)
+        var notesInfo = FirebaseNotes(notes.title, notes.content, dateTime)
         return suspendCoroutine { callback ->
             Log.i("NoteFB","${user.fUid}")
             val ref = database.child("note").child(user.fUid).push()
@@ -70,18 +69,18 @@ object FirebaseDatabase {
         }
     }
 
-    suspend fun getNewNoteFromDB(user: User): ArrayList<NotesKey>? {
+    suspend fun getNewNoteFromDB(user: User): ArrayList<Notes>? {
         return suspendCoroutine { callback ->
             database.child("note").child(user.fUid).get().addOnCompleteListener {
                 if (it.isSuccessful) {
-                    var noteList = ArrayList<NotesKey>()
+                    var noteList = ArrayList<Notes>()
                     var dataSnapshot = it.result
 
                     if (dataSnapshot != null) {
                         for (item in dataSnapshot.children) {
                             var dateModified  = item.child("dateModified").value.toString()
                             val dateTime = DateTypeConverter().toOffsetDateTime(dateModified)
-                            var note = NotesKey(
+                            var note = Notes(
                                 item.child("title").value.toString(),
                                 item.child("content").value.toString(),
                                 dateModified = dateTime,
@@ -100,7 +99,7 @@ object FirebaseDatabase {
         }
     }
 
-    suspend fun updateNewNoteInDB(notes: NotesKey, user: User): Boolean {
+    suspend fun updateNewNoteInDB(notes: Notes, user: User): Boolean {
         val notesMap = mapOf(
             "title" to notes.title,
             "content" to notes.content,
@@ -118,7 +117,7 @@ object FirebaseDatabase {
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: NotesKey, user: User): Boolean {
+    suspend fun deleteNoteFromDB(notes: Notes, user: User): Boolean {
         return suspendCoroutine { callback ->
             database.child("note").child(user.fUid).child(notes.key).removeValue().addOnCompleteListener {
                 if (it.isSuccessful) {

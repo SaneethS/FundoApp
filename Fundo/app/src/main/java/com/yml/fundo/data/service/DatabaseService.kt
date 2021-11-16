@@ -1,22 +1,22 @@
 package com.yml.fundo.data.service
 
 import android.content.Context
-import android.util.Log
 import com.yml.fundo.common.NetworkService
-import com.yml.fundo.data.model.Notes
-import com.yml.fundo.data.wrapper.User
-import com.yml.fundo.data.wrapper.NotesKey
+import com.yml.fundo.ui.wrapper.User
+import com.yml.fundo.ui.wrapper.Notes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object DatabaseService {
-    private lateinit var sqlDb: SqLiteDatabase
+class DatabaseService(val context: Context) {
+    private var sqlDb: SqLiteDatabase = SqLiteDatabase(context)
 
-    fun initSqliteDBService(context: Context) {
-        sqlDb = SqLiteDatabase(context)
+    companion object{
+        private val instance: DatabaseService? by lazy {null}
+
+        fun getInstance(context: Context):DatabaseService = instance?: DatabaseService(context)
     }
 
-    suspend fun setToDatabase(context: Context,user: User): User? {
+    suspend fun setToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
                 val userFirebase = FirebaseDatabase.getFromDatabase(user.fUid)
@@ -29,7 +29,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun setNewUserToDatabase(context: Context,user: User): User? {
+    suspend fun setNewUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO){
             try{
                 val userFirebase = FirebaseDatabase.setToDatabase(user)
@@ -54,7 +54,7 @@ object DatabaseService {
     }
 
 
-    suspend fun addCloudDataToLocalDB(context: Context,user: User) : Boolean {
+    suspend fun addCloudDataToLocalDB(user: User) : Boolean {
         return withContext(Dispatchers.IO){
                 val noteListFromCloud = FirebaseDatabase.getNewNoteFromDB(user)
                 if (noteListFromCloud != null) {
@@ -66,7 +66,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun addNoteToLocalDb(notes: NotesKey):Boolean{
+    suspend fun addNoteToLocalDb(notes: Notes):Boolean{
         return withContext(Dispatchers.IO){
             try {
                 sqlDb.addNewNoteToDB(notes, false)
@@ -78,7 +78,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun addNewNoteToDB(context: Context,notes: NotesKey, user: User): Boolean {
+    suspend fun addNewNoteToDB(notes: Notes, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if(NetworkService.isNetworkAvailable(context)){
@@ -96,7 +96,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<NotesKey>? {
+    suspend fun getNewNoteFromDB(): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {
                 var notesList = sqlDb.getNewNoteFromDB()
@@ -108,7 +108,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun getNewNoteFromCloud(user: User): ArrayList<NotesKey>? {
+    suspend fun getNewNoteFromCloud(user: User): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {
                 var notesList = FirebaseDatabase.getNewNoteFromDB(user)
@@ -122,7 +122,7 @@ object DatabaseService {
 
 
 
-    suspend fun updateNewNoteInDB(context: Context,notes: NotesKey, user: User): Boolean {
+    suspend fun updateNewNoteInDB(notes: Notes, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if(NetworkService.isNetworkAvailable(context)){
@@ -139,7 +139,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun deleteNoteFromDB(context: Context,notes: NotesKey, user: User): Boolean {
+    suspend fun deleteNoteFromDB(notes: Notes, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)){
@@ -156,7 +156,7 @@ object DatabaseService {
         }
     }
 
-    suspend fun getOpCode(notes: NotesKey):Int{
+    suspend fun getOpCode(notes: Notes):Int{
         return withContext(Dispatchers.IO){
             return@withContext sqlDb.getOpCode(notes)
         }
@@ -164,5 +164,9 @@ object DatabaseService {
 
     suspend fun clearNoteAndOperation(){
         sqlDb.clearNoteAndOperation()
+    }
+
+    suspend fun clearAllTables(){
+        sqlDb.clearAllTables()
     }
 }

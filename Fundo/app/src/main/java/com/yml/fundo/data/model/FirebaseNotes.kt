@@ -1,9 +1,7 @@
 package com.yml.fundo.data.model
 
-import java.util.*
-
-data class Notes(
+data class FirebaseNotes(
     var title: String,
     var content: String,
-    var dateModified : String
-    )
+    var dateModified: String
+)

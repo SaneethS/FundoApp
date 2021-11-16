@@ -10,17 +10,17 @@ import com.yml.fundo.auth.Authentication
 import com.yml.fundo.data.service.DatabaseService
 import com.yml.fundo.data.service.Storage
 import com.yml.fundo.data.service.SyncDatabase
-import com.yml.fundo.data.wrapper.NotesKey
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel : ViewModel() {
     private val _userAvatarStatus = MutableLiveData<Bitmap>()
     val userAvatarStatus = _userAvatarStatus as LiveData<Bitmap>
 
-    private val _getNewNotesStatus = MutableLiveData<ArrayList<NotesKey>>()
-    val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<NotesKey>>
+    private val _getNewNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Notes>>
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
@@ -28,57 +28,56 @@ class HomeViewModel: ViewModel() {
     private val _syncDataStatus = MutableLiveData<Boolean>()
     val syncDataStatus = _syncDataStatus as LiveData<Boolean>
 
-    fun logoutFromHome(context: Context){
+    fun logoutFromHome(context: Context) {
         viewModelScope.launch {
             Authentication.logOut(context)
         }
     }
 
-    fun setUserAvatar(bitmap: Bitmap){
+    fun setUserAvatar(bitmap: Bitmap) {
         viewModelScope.launch {
             try {
-                var status = Storage.setAvatar(bitmap)
-                if(status){
+                val status = Storage.setAvatar(bitmap)
+                if (status) {
                     _userAvatarStatus.value = bitmap
                 }
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    fun getUserAvatar(){
+    fun getUserAvatar() {
         viewModelScope.launch {
-            var bitmap = Storage.getAvatar()
-            if(bitmap != null){
+            val bitmap = Storage.getAvatar()
+            if (bitmap != null) {
                 _userAvatarStatus.value = bitmap
             }
         }
     }
 
 
-
-    fun getNewNotes(){
+    fun getNewNotes(context: Context) {
         viewModelScope.launch {
-            var resultNotes = DatabaseService.getNewNoteFromDB()
-            if(resultNotes != null){
+            val resultNotes = DatabaseService.getInstance(context).getNewNoteFromDB()
+            if (resultNotes != null) {
                 _getNewNotesStatus.value = resultNotes
             }
         }
     }
 
-    fun getUserInfo(uid: Long){
+    fun getUserInfo(context: Context, uid: Long) {
         viewModelScope.launch {
-            var userData = DatabaseService.getFromDatabase(uid)
-            if(userData != null){
+            val userData = DatabaseService.getInstance(context).getFromDatabase(uid)
+            if (userData != null) {
                 _userDataStatus.postValue(userData)
             }
         }
     }
 
-    fun syncData(user: User){
+    fun syncData(context: Context, user: User) {
         viewModelScope.launch {
-            SyncDatabase.syncNow(user)
+            SyncDatabase(context).syncNow(user)
             _syncDataStatus.postValue(true)
         }
     }
