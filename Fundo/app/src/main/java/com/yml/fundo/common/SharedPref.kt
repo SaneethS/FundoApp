@@ -18,6 +18,16 @@ object SharedPref {
         editor.apply()
     }
 
+    fun addUid(value: Long){
+        val editor = sharedPreferences.edit()
+        editor.putLong("uid", value)
+        editor.apply()
+    }
+
+    fun getId() : Long{
+        return sharedPreferences.getLong("uid",0L)
+    }
+
     fun get(key: String):String? = sharedPreferences.getString(key,key)
 
     fun clearAll(){

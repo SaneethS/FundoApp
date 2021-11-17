@@ -8,16 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.databinding.RegisterPageBinding
-import com.yml.fundo.data.wrapper.User
+import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.common.Validator
-import com.yml.fundo.ui.activity.SharedViewModel
+import com.yml.fundo.ui.SharedViewModel
 
-class RegisterPage: Fragment(R.layout.register_page) {
+class RegisterPage : Fragment(R.layout.register_page) {
 
-    lateinit var sharedViewModel: SharedViewModel
-    lateinit var registerViewModel: RegisterViewModel
-    lateinit var loading: Dialog
-    lateinit var binding: RegisterPageBinding
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var registerViewModel: RegisterViewModel
+    private lateinit var loading: Dialog
+    private lateinit var binding: RegisterPageBinding
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,28 +41,40 @@ class RegisterPage: Fragment(R.layout.register_page) {
     }
 
     private fun register() {
-        var name = binding.registerName
-        var email = binding.registerEmail
-        var password = binding.registerPassword
-        var confirmPassword = binding.registerConfirmPassword
-        var mobileNO = binding.registerMobile
-        val user = User(name.text.toString(),email.text.toString(),mobileNO.text.toString())
+        val name = binding.registerName
+        val email = binding.registerEmail
+        val password = binding.registerPassword
+        val confirmPassword = binding.registerConfirmPassword
+        val mobileNO = binding.registerMobile
+        val user = User(name.text.toString(), email.text.toString(), mobileNO.text.toString())
 
-        if(Validator.registrationValidation(name,email,password,confirmPassword,mobileNO,requireContext())){
-            registerViewModel.registerNewUser(user, password.text.toString())
-        }else{
+        if (Validator.registrationValidation(
+                name,
+                email,
+                password,
+                confirmPassword,
+                mobileNO,
+                requireContext()
+            )
+        ) {
+            registerViewModel.registerNewUser(requireContext(), user, password.text.toString())
+        } else {
             loading.dismiss()
         }
     }
 
-    fun registerObserver(){
-        registerViewModel.registerStatus.observe(viewLifecycleOwner){
-            if(it){
+    private fun registerObserver() {
+        registerViewModel.registerStatus.observe(viewLifecycleOwner) {
+            if (it) {
                 loading.dismiss()
                 sharedViewModel.setGoToHomePageStatus(true)
-            }else{
+            } else {
                 loading.dismiss()
-                Toast.makeText(requireContext(),getString(R.string.sign_up_unsuccessful_toast),Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.sign_up_unsuccessful_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
