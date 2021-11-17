@@ -48,5 +48,6 @@
     <string name="login_failed_toast">Log-in failed</string>
     <string name="facebook_login_failed_toast">Facebook Log-in failed</string>
     <string name="sign_up_unsuccessful_toast">Sign up unsuccessful</string>
+    <string name="drawer_label_name">Labels</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.yml.fundo.data.service
 
 import android.content.Context
+import android.util.Log
 import com.yml.fundo.auth.Authentication
 import com.yml.fundo.common.CREATE_OP_CODE
 import com.yml.fundo.common.DELETE_OP_CODE
@@ -112,6 +113,7 @@ class SqLiteDatabase(context: Context) {
     }
 
     suspend fun getOpCode(note: Notes): Int{
+        Log.i("Opcode","in op code")
         return withContext(Dispatchers.IO){
             val opc = operationDao.getOpCode(note.key)
             if(opc != null){

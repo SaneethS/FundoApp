@@ -11,6 +11,7 @@ import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.auth.Authentication
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.service.DatabaseService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -23,14 +24,17 @@ class LoginViewModel : ViewModel() {
     fun loginWithEmailAndPassword(context: Context, email: String, password: String) {
         Authentication.loginEmailPassword(email, password) { user ->
             viewModelScope.launch {
-                if (user != null) {
-                    val userDet = DatabaseService.getInstance(context).setToDatabase(user)
-                    if (userDet != null) {
-                        SharedPref.addUid(userDet.uid)
-                        DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)
-                        Log.i("Login", "${userDet.uid}")
-                        _loginStatus.value = userDet
+                if(user?.loginStatus == true){
+                    if (user != null) {
+                        val userDet = DatabaseService.getInstance(context).setToDatabase(user)
+                        if (userDet != null) {
+                            SharedPref.addUid(userDet.uid)
+                            DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)
+                            _loginStatus.postValue(userDet)
+                        }
                     }
+                }else{
+                    _loginStatus.value = user
                 }
             }
         }
@@ -39,13 +43,17 @@ class LoginViewModel : ViewModel() {
     fun facebookLoginWithUser(context: Context, accessToken: AccessToken) {
         Authentication.signInWithFacebook(accessToken) { user ->
             viewModelScope.launch {
-                if (user != null) {
-                    val userDet = DatabaseService.getInstance(context).setNewUserToDatabase(user)
-                    if (userDet != null) {
-                        SharedPref.addUid(user.uid)
-                        DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)
-                        _facebookLoginStatus.value = userDet
+                if(user?.loginStatus == true){
+                    if (user != null) {
+                        val userDet = DatabaseService.getInstance(context).setNewUserToDatabase(user)
+                        if (userDet != null) {
+                            SharedPref.addUid(user.uid)
+                            DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)
+                            _facebookLoginStatus.value = userDet
+                        }
                     }
+                }else{
+                    _facebookLoginStatus.value = user
                 }
             }
         }

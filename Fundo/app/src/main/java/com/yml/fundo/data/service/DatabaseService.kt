@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 
 class DatabaseService(val context: Context) {
     private var sqlDb: SqLiteDatabase = SqLiteDatabase(context)
+    private var firebaseDatabase = FirebaseDatabase.getInstance()
 
     companion object{
         private val instance: DatabaseService? by lazy {null}
@@ -19,7 +20,7 @@ class DatabaseService(val context: Context) {
     suspend fun setToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
-                val userFirebase = FirebaseDatabase.getFromDatabase(user.fUid)
+                val userFirebase = firebaseDatabase.getFromDatabase(user.fUid)
                 val userSql = sqlDb.setToDatabase(userFirebase)
                 userSql
             } catch (e: Exception) {
@@ -32,7 +33,7 @@ class DatabaseService(val context: Context) {
     suspend fun setNewUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO){
             try{
-                val userFirebase = FirebaseDatabase.setToDatabase(user)
+                val userFirebase = firebaseDatabase.setToDatabase(user)
                 val userSql = sqlDb.setToDatabase(userFirebase!!)
                 userSql
             }catch (e: Exception) {
@@ -56,7 +57,7 @@ class DatabaseService(val context: Context) {
 
     suspend fun addCloudDataToLocalDB(user: User) : Boolean {
         return withContext(Dispatchers.IO){
-                val noteListFromCloud = FirebaseDatabase.getNewNoteFromDB(user)
+                val noteListFromCloud = firebaseDatabase.getNewNoteFromDB(user)
                 if (noteListFromCloud != null) {
                     for( i in noteListFromCloud){
                         sqlDb.addNewNoteToDB(i)
@@ -82,8 +83,8 @@ class DatabaseService(val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 if(NetworkService.isNetworkAvailable(context)){
-                    var note = FirebaseDatabase.addNewNoteToDB(notes,user)
-                    sqlDb.addNewNoteToDB(note)
+                    val note = firebaseDatabase.addNewNoteToDB(notes,user)
+                    sqlDb.addNewNoteToDB(note, true)
                 }else{
                     sqlDb.addNewNoteToDB(notes, false)
                 }
@@ -99,7 +100,7 @@ class DatabaseService(val context: Context) {
     suspend fun getNewNoteFromDB(): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {
-                var notesList = sqlDb.getNewNoteFromDB()
+                val notesList = sqlDb.getNewNoteFromDB()
                 notesList
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -111,7 +112,7 @@ class DatabaseService(val context: Context) {
     suspend fun getNewNoteFromCloud(user: User): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {
-                var notesList = FirebaseDatabase.getNewNoteFromDB(user)
+                val notesList = firebaseDatabase.getNewNoteFromDB(user)
                 notesList
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -126,8 +127,8 @@ class DatabaseService(val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 if(NetworkService.isNetworkAvailable(context)){
-                    sqlDb.updateNewNoteInDB(notes)
-                    FirebaseDatabase.updateNewNoteInDB(notes, user)
+                    sqlDb.updateNewNoteInDB(notes,true)
+                    firebaseDatabase.updateNewNoteInDB(notes, user)
                 }else{
                     sqlDb.updateNewNoteInDB(notes, false)
                 }
@@ -143,8 +144,8 @@ class DatabaseService(val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)){
-                    sqlDb.deleteNoteFromDB(notes)
-                    FirebaseDatabase.deleteNoteFromDB(notes, user)
+                    sqlDb.deleteNoteFromDB(notes, true)
+                    firebaseDatabase.deleteNoteFromDB(notes, user)
                 }else{
                     sqlDb.deleteNoteFromDB(notes, false)
                 }

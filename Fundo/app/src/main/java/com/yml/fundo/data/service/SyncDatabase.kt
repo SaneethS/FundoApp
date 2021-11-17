@@ -2,19 +2,26 @@ package com.yml.fundo.data.service
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.yml.fundo.common.DELETE_OP_CODE
+import com.yml.fundo.common.NetworkService
 import com.yml.fundo.ui.wrapper.Notes
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SyncDatabase(val context: Context) {
+    private var firebaseDatabase = FirebaseDatabase.getInstance()
 
     suspend fun syncNow(user: User){
-        val latestNotes = getLatestNotesFromDB(user)
-        DatabaseService.getInstance(context).clearNoteAndOperation()
-        latestNotes.forEach{
-            DatabaseService.getInstance(context).addNoteToLocalDb(it)
+        if(NetworkService.isNetworkAvailable(context)){
+            val latestNotes = getLatestNotesFromDB(user)
+            DatabaseService.getInstance(context).clearNoteAndOperation()
+            latestNotes.forEach{
+                DatabaseService.getInstance(context).addNoteToLocalDb(it)
+            }
+        }else{
+            Toast.makeText(context, "No Internet Available", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -37,7 +44,7 @@ class SyncDatabase(val context: Context) {
                             Log.i("SyncDb",res.toString())
                             if(res){
                                 latestNotes.add(noteL)
-                                FirebaseDatabase.updateNewNoteInDB(
+                                firebaseDatabase.updateNewNoteInDB(
                                     noteL,
                                     user
                                 )
@@ -58,7 +65,7 @@ class SyncDatabase(val context: Context) {
                     for(noteF in firebaseNotesList){
                         if(noteL.key == noteF.key){
                             if(getOpCode(noteL) == DELETE_OP_CODE){
-                                FirebaseDatabase.deleteNoteFromDB(
+                                firebaseDatabase.deleteNoteFromDB(
                                     noteL,
                                     user
                                 )
@@ -72,7 +79,7 @@ class SyncDatabase(val context: Context) {
                         val opCode = getOpCode(noteL)
                         if(opCode != -1){
                             latestNotes.add(noteL)
-                            FirebaseDatabase.addNewNoteToDB(
+                            firebaseDatabase.addNewNoteToDB(
                                 noteL,
                                 user
                             )
@@ -93,8 +100,8 @@ class SyncDatabase(val context: Context) {
     }
 
     private fun compareTimeStamp(noteL: Notes, noteF: Notes): Boolean{
-        var localTime = noteL.dateModified
-        var cloudTime = noteF.dateModified
+        val localTime = noteL.dateModified
+        val cloudTime = noteF.dateModified
         Log.i("SyncDblocal",localTime.toString())
         Log.i("SyncDbcloud",cloudTime.toString())
         return if(localTime != null && cloudTime != null){
