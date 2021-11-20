@@ -47,7 +47,6 @@ class HomePage : Fragment(R.layout.home_page) {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
         private var notesList = ArrayList<Notes>()
-//        private var searchList = ArrayList<Notes>()
         private var currentUser: User =
             User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
     }
@@ -136,7 +135,6 @@ class HomePage : Fragment(R.layout.home_page) {
                 requireActivity().supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_view, notePage).commit()
             }
-
         })
     }
 
@@ -277,5 +275,4 @@ class HomePage : Fragment(R.layout.home_page) {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_RESULTCODE)
     }
-
 }

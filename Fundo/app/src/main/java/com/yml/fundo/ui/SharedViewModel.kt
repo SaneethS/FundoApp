@@ -23,6 +23,9 @@ class SharedViewModel : ViewModel() {
     private val _goToNotePageStatus = MutableLiveData<Boolean>()
     val goToNotePageStatus = _goToNotePageStatus as LiveData<Boolean>
 
+    private val _goToLabelCreateStatus = MutableLiveData<Boolean>()
+    val goToLabelCreateStatus = _goToLabelCreateStatus as LiveData<Boolean>
+
     fun setGoToHomePageStatus(status: Boolean) {
         _goToHomePageStatus.value = status
     }
@@ -41,5 +44,9 @@ class SharedViewModel : ViewModel() {
 
     fun setGoToNotePageStatus(status: Boolean) {
         _goToNotePageStatus.value = status
+    }
+
+    fun setGoToLabelCreateStatus(status: Boolean) {
+        _goToLabelCreateStatus.value = status
     }
 }

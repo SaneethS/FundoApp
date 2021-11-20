@@ -75,8 +75,10 @@ object Authentication {
                 var name = fbUser?.displayName.toString()
                 var email = fbUser?.email.toString()
                 var mobileNo = fbUser?.phoneNumber.toString()
-                user = User(name = name, email = email, mobileNo = mobileNo,
-                    loginStatus = true, fUid = getCurrentUser()?.uid.toString())
+                user = User(
+                    name = name, email = email, mobileNo = mobileNo,
+                    loginStatus = true, fUid = getCurrentUser()?.uid.toString()
+                )
                 callback(user)
             } else {
                 user = User(name = "", email = "", mobileNo = "", loginStatus = false)
@@ -96,7 +98,7 @@ object Authentication {
     }
 
     suspend fun logOut(context: Context) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             SharedPref.clearAll()
             LoginManager.getInstance().logOut()
             DatabaseService.getInstance(context).clearAllTables()

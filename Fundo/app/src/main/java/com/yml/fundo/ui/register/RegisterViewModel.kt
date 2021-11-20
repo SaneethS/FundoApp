@@ -30,9 +30,6 @@ class RegisterViewModel : ViewModel() {
             } else {
                 _registerStatus.value = it?.loginStatus
             }
-
-
-            Log.i("db", "user added to db")
         }
     }
 }

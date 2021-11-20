@@ -14,7 +14,6 @@ import com.yml.fundo.data.room.entity.UserEntity
 @TypeConverters(DateTypeConverter::class)
 abstract class LocalDatabase: RoomDatabase() {
 
-
     abstract fun userDao(): UserDao
     abstract fun notesDao(): NotesDao
     abstract fun operationDao(): OperationDao
