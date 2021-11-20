@@ -15,16 +15,16 @@ import com.facebook.login.LoginResult
 import com.yml.fundo.R
 import com.yml.fundo.databinding.LoginPageBinding
 import com.yml.fundo.common.Validator
-import com.yml.fundo.ui.activity.SharedViewModel
+import com.yml.fundo.ui.SharedViewModel
 
-class LoginPage:Fragment(R.layout.login_page) {
-    lateinit var binding:LoginPageBinding
-    lateinit var callbackManager: CallbackManager
-    lateinit var sharedViewModel: SharedViewModel
-    lateinit var loginViewModel: LoginViewModel
+class LoginPage : Fragment(R.layout.login_page) {
+    private lateinit var binding: LoginPageBinding
+    private lateinit var callbackManager: CallbackManager
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var loginViewModel: LoginViewModel
 
-    companion object{
-        lateinit var loading:Dialog
+    companion object {
+        private lateinit var loading: Dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,9 +46,9 @@ class LoginPage:Fragment(R.layout.login_page) {
             login()
         }
 
-        binding.facebookLogin.setOnClickListener{
+        binding.facebookLogin.setOnClickListener {
             loading.show()
-            facbookLogin()
+            facebookLogin()
         }
 
         binding.forgotPasswordLink.setOnClickListener {
@@ -62,25 +62,33 @@ class LoginPage:Fragment(R.layout.login_page) {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        callbackManager.onActivityResult(requestCode,resultCode,data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun facbookLogin() {
-        var fbLogin = binding.facebookLogin
-        fbLogin.setReadPermissions("email","public_profile")
-        fbLogin.registerCallback(callbackManager,object : FacebookCallback<LoginResult>{
+    private fun facebookLogin() {
+        val fbLogin = binding.facebookLogin
+        fbLogin.setReadPermissions("email", "public_profile")
+        fbLogin.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onCancel() {
                 loading.dismiss()
-                Toast.makeText(requireContext(),getString(R.string.cancelled_toast),Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.cancelled_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             override fun onError(error: FacebookException) {
                 loading.dismiss()
-                Toast.makeText(requireContext(),getString(R.string.error_occured_toast),Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_occured_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             override fun onSuccess(result: LoginResult) {
-                loginViewModel.facebookLoginWithUser(result.accessToken)
+                loginViewModel.facebookLoginWithUser(requireContext(), result.accessToken)
 
             }
 
@@ -88,35 +96,47 @@ class LoginPage:Fragment(R.layout.login_page) {
     }
 
     private fun login() {
-        var email = binding.usernameField
-        var password = binding.passwordField
-        if(Validator.loginValidation(email,password,requireContext())){
-            loginViewModel.loginWithEmailAndPassword(email.text.toString(),password.text.toString())
-        }else{
+        val email = binding.usernameField
+        val password = binding.passwordField
+        if (Validator.loginValidation(email, password, requireContext())) {
+            loginViewModel.loginWithEmailAndPassword(
+                requireContext(),
+                email.text.toString(),
+                password.text.toString()
+            )
+        } else {
             loading.dismiss()
         }
     }
 
-    fun loginObserver(){
+    private fun loginObserver() {
         loginViewModel.loginStatus.observe(viewLifecycleOwner) {
-            if(it?.loginStatus == true){
+            if (it?.loginStatus == true) {
                 loading.dismiss()
                 sharedViewModel.setGoToHomePageStatus(true)
 
-            }else{
+            } else {
                 loading.dismiss()
-                Toast.makeText(requireContext(),getString(R.string.login_failed_toast), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.login_failed_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
 
-        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner){
-            if(it?.loginStatus == true){
+        loginViewModel.facebookLoginStatus.observe(viewLifecycleOwner) {
+            if (it?.loginStatus == true) {
                 loading.dismiss()
                 sharedViewModel.setGoToHomePageStatus(true)
 
-            }else{
+            } else {
                 loading.dismiss()
-                Toast.makeText(requireContext(),getString(R.string.facebook_login_failed_toast), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.facebook_login_failed_toast),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

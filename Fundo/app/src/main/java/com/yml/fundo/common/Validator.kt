@@ -8,57 +8,59 @@ import com.yml.fundo.R
 
 object Validator {
 
-    fun registrationValidation(name:TextInputEditText,
-                               email: TextInputEditText,
-                               password: TextInputEditText,
-                               confirmPassword: TextInputEditText
-                               ,mobileNo: TextInputEditText,
-    context:Context): Boolean
-    {
+    fun registrationValidation(
+        name: TextInputEditText,
+        email: TextInputEditText,
+        password: TextInputEditText,
+        confirmPassword: TextInputEditText, mobileNo: TextInputEditText,
+        context: Context
+    ): Boolean {
         var status = true
-        if(validateName(name.text.toString())){
+        if (validateName(name.text.toString())) {
             name.setError(context.getString(R.string.validate_name))
             status = false
         }
-        if(validateEmail(email.text.toString())){
+        if (validateEmail(email.text.toString())) {
             email.setError(context.getString(R.string.validate_email))
             status = false
         }
-        if(validateMobileNo(mobileNo.text.toString())){
+        if (validateMobileNo(mobileNo.text.toString())) {
             mobileNo.setError(context.getString(R.string.validate_mobile_no))
             status = false
         }
-        if(validatePassword( password.text.toString())){
+        if (validatePassword(password.text.toString())) {
             password.setError(context.getString(R.string.validate_password))
             confirmPassword.setError(context.getString(R.string.validate_password))
             status = false
         }
-        if(password.text.toString() != confirmPassword.text.toString()){
+        if (password.text.toString() != confirmPassword.text.toString()) {
             confirmPassword.setError(context.getString(R.string.password_confirm_password))
             status = false
         }
-        Log.i("validator","status = $status")
+        Log.i("validator", "status = $status")
         return status
     }
 
-    fun loginValidation(email: TextInputEditText,
-                        password: TextInputEditText,
-    context: Context): Boolean{
+    fun loginValidation(
+        email: TextInputEditText,
+        password: TextInputEditText,
+        context: Context
+    ): Boolean {
         var status = true
-        if(validateEmail(email.text.toString())){
+        if (validateEmail(email.text.toString())) {
             email.setError(context.getString(R.string.validate_email))
             status = false
         }
-        if(validatePassword( password.text.toString())){
+        if (validatePassword(password.text.toString())) {
             password.setError(context.getString(R.string.validate_password))
             status = false
         }
         return status
     }
 
-    fun forgotPasswordValidator(email: TextInputEditText, context: Context):Boolean{
+    fun forgotPasswordValidator(email: TextInputEditText, context: Context): Boolean {
         var status = true
-        if(validateEmail(email.text.toString())){
+        if (validateEmail(email.text.toString())) {
             email.setError(context.getString(R.string.validate_email))
             status = false
         }

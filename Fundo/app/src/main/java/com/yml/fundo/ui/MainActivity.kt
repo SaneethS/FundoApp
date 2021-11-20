@@ -1,30 +1,27 @@
-package com.yml.fundo.ui.activity
+package com.yml.fundo.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
+import com.yml.fundo.common.SharedPref
 import com.yml.fundo.databinding.ActivityMainBinding
-import com.yml.fundo.ui.fragments.*
 import com.yml.fundo.ui.home.HomePage
+import com.yml.fundo.ui.label.LabelCreatePage
 import com.yml.fundo.ui.login.LoginPage
 import com.yml.fundo.ui.note.NotePage
 import com.yml.fundo.ui.register.RegisterPage
 import com.yml.fundo.ui.reset.ResetPassword
 import com.yml.fundo.ui.splash.SplashScreen
-import com.yml.fundo.common.SharedPref
 
 class MainActivity : AppCompatActivity() {
-    lateinit var sharedViewModel: SharedViewModel
-    lateinit var toggle:ActionBarDrawerToggle
-
-    lateinit var binding: ActivityMainBinding
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,45 +31,49 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.homePageToolbar)
         SharedPref.initSharedPref(this)
         observeNavigation()
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             goToSplashScreen()
         }
         navigationDrawer()
-
     }
 
-    fun observeNavigation(){
-        sharedViewModel.goToHomePageStatus.observe(this@MainActivity){
-            if(it){
+    private fun observeNavigation() {
+        sharedViewModel.goToHomePageStatus.observe(this@MainActivity) {
+            if (it) {
                 goToHomePage()
             }
         }
-        sharedViewModel.goToLoginPageStatus.observe(this@MainActivity){
-            if(it){
+        sharedViewModel.goToLoginPageStatus.observe(this@MainActivity) {
+            if (it) {
                 goToLoginPage()
             }
         }
-        sharedViewModel.goToRegisterPageStatus.observe(this@MainActivity){
-            if(it){
+        sharedViewModel.goToRegisterPageStatus.observe(this@MainActivity) {
+            if (it) {
                 goToRegisterPage()
             }
         }
-        sharedViewModel.goToSplashScreenStatus.observe(this@MainActivity){
-            if(it){
+        sharedViewModel.goToSplashScreenStatus.observe(this@MainActivity) {
+            if (it) {
                 goToSplashScreen()
             }
         }
-        sharedViewModel.goToResetPasswordStatus.observe(this@MainActivity){
-            if(it){
+        sharedViewModel.goToResetPasswordStatus.observe(this@MainActivity) {
+            if (it) {
                 goToResetPassword()
             }
         }
-        sharedViewModel.goToNotePageStatus.observe(this@MainActivity){
-            if(it){
+        sharedViewModel.goToNotePageStatus.observe(this@MainActivity) {
+            if (it) {
                 goToNotePage()
             }
         }
 
+        sharedViewModel.goToLabelCreateStatus.observe(this@MainActivity) {
+            if (it) {
+                goToLabelCreate()
+            }
+        }
     }
 
     private fun goToResetPassword() {
@@ -95,42 +96,45 @@ class MainActivity : AppCompatActivity() {
         switchFragment(HomePage())
     }
 
-    private fun goToNotePage(){
+    private fun goToNotePage() {
         switchFragment(NotePage())
     }
 
-    fun switchFragment(fragment: Fragment){
-        var fragmentManager = supportFragmentManager
-        var fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment_view,fragment)
-        fragmentTransaction.commit()
+    private fun goToLabelCreate() {
+        switchFragment(LabelCreatePage())
     }
 
-    fun navigationDrawer(){
-        toggle = object:ActionBarDrawerToggle(this,binding.drawerLayout,binding.homePageToolbar,R.string.open,R.string.close){
-            override fun onDrawerOpened(drawerView: View) {
-                super.onDrawerOpened(drawerView)
-                val header = binding.navigationDrawer.getHeaderView(0)
-                val headerText:TextView = header.findViewById(R.id.drawer_name_text)
-                headerText.text = SharedPref.get("userName")
-            }
-        }
+    private fun switchFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
+    }
+
+    private fun navigationDrawer() {
+        toggle = ActionBarDrawerToggle(
+            this,
+            binding.drawerLayout,
+            binding.homePageToolbar,
+            R.string.open,
+            R.string.close
+        )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.isDrawerIndicatorEnabled = true
         toggle.syncState()
-
-
+        val navNotes = binding.navigationDrawer.menu.getItem(0)
+        navNotes.isChecked = true
 
         binding.navigationDrawer.setNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.notes -> Toast.makeText(this,"Notes selected",Toast.LENGTH_LONG).show()
-                R.id.reminders-> Toast.makeText(this,"Reminder selected",Toast.LENGTH_LONG).show()
+            navNotes.isChecked = false
+            when (it.itemId) {
+                R.id.notes -> sharedViewModel.setGoToHomePageStatus(true)
+                R.id.reminders -> Toast.makeText(
+                    this, "Reminder selected",
+                    Toast.LENGTH_LONG
+                ).show()
+                R.id.labels -> sharedViewModel.setGoToLabelCreateStatus(true)
             }
+            it.isCheckable = true
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
     }
-
-
 }

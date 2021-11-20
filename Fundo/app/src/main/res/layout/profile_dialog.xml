@@ -48,12 +48,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/dialog_email"
-        android:text="mobile"
-        android:textSize="20sp"
-        android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
-        >
-    </TextView>
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"></TextView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/dialog_logout"
