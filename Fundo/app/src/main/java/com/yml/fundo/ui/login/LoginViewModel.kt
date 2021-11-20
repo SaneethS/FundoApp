@@ -24,7 +24,7 @@ class LoginViewModel : ViewModel() {
     fun loginWithEmailAndPassword(context: Context, email: String, password: String) {
         Authentication.loginEmailPassword(email, password) { user ->
             viewModelScope.launch {
-                if(user?.loginStatus == true){
+                if (user?.loginStatus == true) {
                     if (user != null) {
                         val userDet = DatabaseService.getInstance(context).setToDatabase(user)
                         if (userDet != null) {
@@ -33,7 +33,7 @@ class LoginViewModel : ViewModel() {
                             _loginStatus.postValue(userDet)
                         }
                     }
-                }else{
+                } else {
                     _loginStatus.value = user
                 }
             }
@@ -43,16 +43,17 @@ class LoginViewModel : ViewModel() {
     fun facebookLoginWithUser(context: Context, accessToken: AccessToken) {
         Authentication.signInWithFacebook(accessToken) { user ->
             viewModelScope.launch {
-                if(user?.loginStatus == true){
+                if (user?.loginStatus == true) {
                     if (user != null) {
-                        val userDet = DatabaseService.getInstance(context).setNewUserToDatabase(user)
+                        val userDet =
+                            DatabaseService.getInstance(context).setNewUserToDatabase(user)
                         if (userDet != null) {
                             SharedPref.addUid(user.uid)
                             DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)
                             _facebookLoginStatus.value = userDet
                         }
                     }
-                }else{
+                } else {
                     _facebookLoginStatus.value = user
                 }
             }

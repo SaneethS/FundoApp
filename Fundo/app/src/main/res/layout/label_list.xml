@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="20dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/delete_label_button"
+            android:tag="label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:src="@drawable/label_outlined"></ImageView>
+
+        <EditText
+            android:padding="10dp"
+            android:id="@+id/list_label_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/label"
+            android:background="@null"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/delete_label_button"
+            android:layout_marginTop = "5dp"
+            android:textSize="24sp">
+        </EditText>
+
+        <ImageView
+            android:id="@+id/edit_label_button"
+            android:tag="pen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/list_label_name"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/edit_icon"></ImageView>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -35,21 +35,21 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getFromDatabase(uid: Long): User{
+    suspend fun getFromDatabase(uid: Long): User {
         return withContext(Dispatchers.IO) {
             val userInfo = userDao.getUserFromDB(uid)
             val user = User(
-                        name = userInfo.name,
-                        email = userInfo.email,
-                        mobileNo = userInfo.mobile,
-                        fUid = userInfo.fid,
-                        uid = userInfo.uid
-                        )
+                name = userInfo.name,
+                email = userInfo.email,
+                mobileNo = userInfo.mobile,
+                fUid = userInfo.fid,
+                uid = userInfo.uid
+            )
             user
         }
     }
 
-    suspend fun addNewNoteToDB(notes: Notes, onlineStatus:Boolean = true): Notes {
+    suspend fun addNewNoteToDB(notes: Notes, onlineStatus: Boolean = true): Notes {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key,
@@ -59,7 +59,7 @@ class SqLiteDatabase(context: Context) {
                 nid = notes.id
             )
             notes.id = notesDao.addNewNoteToDB(noteEntity)
-            if(!onlineStatus){
+            if (!onlineStatus) {
                 val opEntity = OperationEntity(notes.key, CREATE_OP_CODE)
                 operationDao.addOp(opEntity)
             }
@@ -67,13 +67,15 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<Notes>{
-        return withContext(Dispatchers.IO){
+    suspend fun getNewNoteFromDB(): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getNewNoteFromDB()
             val notesList = arrayListOf<Notes>()
-            for (i in notesEntity){
-                val notesKey = Notes(title = i.title, content = i.content,
-                    key = i.fNid, dateModified = i.dateModified, id = i.nid)
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid
+                )
                 notesList.add(notesKey)
             }
             notesList
@@ -87,7 +89,7 @@ class SqLiteDatabase(context: Context) {
                 dateModified = notes.dateModified, nid = notes.id
             )
             notesDao.updateNewNoteInDB(noteEntity)
-            if(!onlineStatus){
+            if (!onlineStatus) {
                 val opEntity = OperationEntity(notes.key, UPDATE_OP_CODE)
                 operationDao.addOp(opEntity)
             }
@@ -102,8 +104,8 @@ class SqLiteDatabase(context: Context) {
                 dateModified = notes.dateModified, nid = notes.id
             )
             notesDao.deleteNoteFromDB(noteEntity)
-            if(!onlineStatus){
-                if(notes.key.isNotEmpty()){
+            if (!onlineStatus) {
+                if (notes.key.isNotEmpty()) {
                     val opEntity = OperationEntity(notes.key, DELETE_OP_CODE)
                     operationDao.addOp(opEntity)
                 }
@@ -112,24 +114,24 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getOpCode(note: Notes): Int{
-        Log.i("Opcode","in op code")
-        return withContext(Dispatchers.IO){
+    suspend fun getOpCode(note: Notes): Int {
+        Log.i("Opcode", "in op code")
+        return withContext(Dispatchers.IO) {
             val opc = operationDao.getOpCode(note.key)
-            if(opc != null){
+            if (opc != null) {
                 return@withContext opc.opCode
-            }else{
+            } else {
                 return@withContext -1
             }
         }
     }
 
-    suspend fun clearNoteAndOperation(){
+    suspend fun clearNoteAndOperation() {
         notesDao.deleteNoteTable()
         operationDao.deleteOp()
     }
 
-    suspend fun clearAllTables(){
+    suspend fun clearAllTables() {
         localDatabase.clearAllTables()
     }
 }

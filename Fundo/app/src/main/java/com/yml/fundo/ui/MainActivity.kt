@@ -11,6 +11,7 @@ import com.yml.fundo.R
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.ui.home.HomePage
+import com.yml.fundo.ui.label.LabelCreatePage
 import com.yml.fundo.ui.login.LoginPage
 import com.yml.fundo.ui.note.NotePage
 import com.yml.fundo.ui.register.RegisterPage
@@ -67,6 +68,12 @@ class MainActivity : AppCompatActivity() {
                 goToNotePage()
             }
         }
+
+        sharedViewModel.goToLabelCreateStatus.observe(this@MainActivity) {
+            if (it) {
+                goToLabelCreate()
+            }
+        }
     }
 
     private fun goToResetPassword() {
@@ -93,11 +100,12 @@ class MainActivity : AppCompatActivity() {
         switchFragment(NotePage())
     }
 
+    private fun goToLabelCreate() {
+        switchFragment(LabelCreatePage())
+    }
+
     private fun switchFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment_view, fragment)
-        fragmentTransaction.commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_view, fragment).commit()
     }
 
     private fun navigationDrawer() {
@@ -122,6 +130,7 @@ class MainActivity : AppCompatActivity() {
                     this, "Reminder selected",
                     Toast.LENGTH_LONG
                 ).show()
+                R.id.labels -> sharedViewModel.setGoToLabelCreateStatus(true)
             }
             it.isCheckable = true
             binding.drawerLayout.closeDrawer(GravityCompat.START)
