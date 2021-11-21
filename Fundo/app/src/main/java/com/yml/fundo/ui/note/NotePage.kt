@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
@@ -25,6 +26,7 @@ class NotePage : Fragment(R.layout.note_page) {
     private var noteKey: String = ""
     private var bundleDateModified: Date? = null
     private var bundleNoteId: Long? = null
+    private var bundleArchived: Boolean? = null
     private var userId: Long = 0L
     private var currentUser: User =
         User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
@@ -71,10 +73,15 @@ class NotePage : Fragment(R.layout.note_page) {
         }
 
         noteContents()
+        checkVisibility()
 
         noteViewModel.updateNoteStatus.observe(viewLifecycleOwner) {
             if (it) {
-                sharedViewModel.setGoToHomePageStatus(true)
+                if(bundleArchived == true) {
+                    sharedViewModel.setGoToArchivedNotePageStatus(true)
+                }else {
+                    sharedViewModel.setGoToHomePageStatus(true)
+                }
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -98,6 +105,46 @@ class NotePage : Fragment(R.layout.note_page) {
 
         noteViewModel.userDataStatus.observe(viewLifecycleOwner) {
             currentUser = it
+        }
+
+        archiveNotes()
+    }
+
+    private fun archiveNotes() {
+        if(bundleArchived == false) {
+            binding.archiveButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(),
+                R.drawable.archive_notepage))
+        }else {
+            binding.archiveButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(),
+                R.drawable.unarchive_notepage))
+        }
+        binding.archiveButton.setOnClickListener {
+            if(bundleArchived == false){
+                val title = binding.titleText.text.toString()
+                val content = binding.noteText.text.toString()
+                val note =
+                    Notes(title, content, dateModified = bundleDateModified, noteKey,
+                        bundleNoteId!!, archived = true)
+                noteViewModel.updateNotes(requireContext(), note, currentUser)
+
+            }else if(bundleArchived== true) {
+                val title = binding.titleText.text.toString()
+                val content = binding.noteText.text.toString()
+                val note =
+                    Notes(title, content, dateModified = bundleDateModified, noteKey,
+                        bundleNoteId!!, archived = false)
+                noteViewModel.updateNotes(requireContext(), note, currentUser)
+            }
+        }
+    }
+
+    private fun checkVisibility() {
+        if(bundleNoteId == null){
+            binding.deleteButton.visibility = View.GONE
+            binding.archiveButton.visibility = View.GONE
+        }else{
+            binding.deleteButton.visibility = View.VISIBLE
+            binding.archiveButton.visibility =  View.VISIBLE
         }
     }
 
@@ -124,6 +171,7 @@ class NotePage : Fragment(R.layout.note_page) {
         noteKey = arguments?.getString("key").toString()
         bundleDateModified = dateTime
         bundleNoteId = arguments?.getLong("id")
+        bundleArchived = arguments?.getBoolean("archived")
         Log.i("BundleKey", "$bundleNoteId")
         binding.titleText.setText(noteTitle)
         binding.noteText.setText(noteContent)
@@ -138,7 +186,8 @@ class NotePage : Fragment(R.layout.note_page) {
             noteViewModel.addNewNote(requireContext(), notes, currentUser)
         } else {
             val note =
-                Notes(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!)
+                Notes(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!,
+                bundleArchived!!)
             noteViewModel.updateNotes(requireContext(), note, currentUser)
             Toast.makeText(
                 requireContext(),

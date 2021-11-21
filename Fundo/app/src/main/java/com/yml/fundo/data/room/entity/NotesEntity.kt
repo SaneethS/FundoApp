@@ -13,4 +13,5 @@ data class NotesEntity(
     val title: String,
     val content: String,
     val dateModified: Date?,
+    var archived: Boolean
 )

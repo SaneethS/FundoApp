@@ -110,6 +110,18 @@ class DatabaseService(val context: Context) {
         }
     }
 
+    suspend fun getArchiveNotesFromDB(): ArrayList<Notes>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notesList = sqlDb.getArchiveNoteFromDB()
+                notesList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     suspend fun getNewNoteFromCloud(user: User): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {
@@ -219,4 +231,6 @@ class DatabaseService(val context: Context) {
             }
         }
     }
+
+
 }

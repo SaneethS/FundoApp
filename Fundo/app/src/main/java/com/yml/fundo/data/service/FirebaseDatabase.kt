@@ -65,7 +65,7 @@ class FirebaseDatabase {
 
     suspend fun addNewNoteToDB(notes: Notes, user: User): Notes {
         val dateTime = DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
-        val notesInfo = FirebaseNotes(notes.title, notes.content, dateTime)
+        val notesInfo = FirebaseNotes(notes.title, notes.content, dateTime, notes.archived)
         return suspendCoroutine { callback ->
             val refId =
                 fireStore.collection("users").document(user.fUid)
@@ -98,7 +98,8 @@ class FirebaseDatabase {
                                 noteHashMap["title"].toString(),
                                 noteHashMap["content"].toString(),
                                 dateModified = DateTypeConverter().toOffsetDateTime(noteHashMap["dateModified"].toString()) as Date,
-                                item.id
+                                item.id,
+                                archived = noteHashMap["archived"] as Boolean
                             )
                             noteList.add(note)
                         }
@@ -117,7 +118,8 @@ class FirebaseDatabase {
         val notesMap = mapOf(
             "title" to notes.title,
             "content" to notes.content,
-            "dateModified" to DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
+            "dateModified" to DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString(),
+            "archived" to notes.archived
         )
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid).collection("notes")
