@@ -56,7 +56,8 @@ class SqLiteDatabase(context: Context) {
                 title = notes.title,
                 content = notes.content,
                 dateModified = notes.dateModified,
-                nid = notes.id
+                nid = notes.id,
+                archived = notes.archived
             )
             notes.id = notesDao.addNewNoteToDB(noteEntity)
             if (!onlineStatus) {
@@ -74,7 +75,8 @@ class SqLiteDatabase(context: Context) {
             for (i in notesEntity) {
                 val notesKey = Notes(
                     title = i.title, content = i.content,
-                    key = i.fNid, dateModified = i.dateModified, id = i.nid
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived
                 )
                 notesList.add(notesKey)
             }
@@ -86,7 +88,7 @@ class SqLiteDatabase(context: Context) {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
-                dateModified = notes.dateModified, nid = notes.id
+                dateModified = notes.dateModified, nid = notes.id, archived = notes.archived
             )
             notesDao.updateNewNoteInDB(noteEntity)
             if (!onlineStatus) {
@@ -101,7 +103,8 @@ class SqLiteDatabase(context: Context) {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
-                dateModified = notes.dateModified, nid = notes.id
+                dateModified = notes.dateModified, nid = notes.id,
+                archived = notes.archived
             )
             notesDao.deleteNoteFromDB(noteEntity)
             if (!onlineStatus) {
@@ -133,5 +136,21 @@ class SqLiteDatabase(context: Context) {
 
     suspend fun clearAllTables() {
         localDatabase.clearAllTables()
+    }
+
+    suspend fun getArchiveNoteFromDB(): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
+            val notesEntity = notesDao.getArchivedNoteFromDB()
+            val notesList = arrayListOf<Notes>()
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived
+                )
+                notesList.add(notesKey)
+            }
+            notesList
+        }
     }
 }

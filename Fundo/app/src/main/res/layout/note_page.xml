@@ -23,6 +23,17 @@
         android:layout_alignTop="@+id/back_button">
     </ImageView>
 
+    <ImageView
+        android:id="@+id/archive_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="archive"
+        android:layout_alignTop="@+id/back_button"
+        android:layout_marginEnd="10dp"
+        android:layout_toStartOf="@+id/delete_button"
+        android:src="@drawable/archive_notepage">
+    </ImageView>
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/title_text_layout"

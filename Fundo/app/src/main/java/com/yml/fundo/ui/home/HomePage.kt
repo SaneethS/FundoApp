@@ -31,7 +31,7 @@ import com.yml.fundo.ui.wrapper.Notes
 import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.ui.note.NotePage
 
-class HomePage : Fragment(R.layout.home_page) {
+class HomePage(private var archived: Boolean = false) : Fragment(R.layout.home_page) {
     private lateinit var binding: HomePageBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var homeViewModel: HomeViewModel
@@ -91,6 +91,13 @@ class HomePage : Fragment(R.layout.home_page) {
 
         myRecyclerView()
         noteClick()
+        checkVisibility()
+    }
+
+    private fun checkVisibility() {
+        if(archived) {
+            binding.homeFab.visibility = View.GONE
+        }
     }
 
     private fun refreshNotes() {
@@ -130,6 +137,7 @@ class HomePage : Fragment(R.layout.home_page) {
                 bundle.putString("key", note.key)
                 bundle.putLong("id", note.id)
                 bundle.putString("dateModified", dateTime)
+                bundle.putBoolean("archived", note.archived)
                 val notePage = NotePage()
                 notePage.arguments = bundle
                 requireActivity().supportFragmentManager.beginTransaction()
@@ -144,9 +152,19 @@ class HomePage : Fragment(R.layout.home_page) {
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = myAdapter
-        homeViewModel.getNewNotes(requireContext())
+        if(archived){
+            homeViewModel.getArchivedNotes(requireContext())
+        }else{
+            homeViewModel.getNewNotes(requireContext())
+        }
 
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
+            notesList.clear()
+            notesList.addAll(it)
+            myAdapter.notifyDataSetChanged()
+        }
+
+        homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
             myAdapter.notifyDataSetChanged()

@@ -7,5 +7,6 @@ data class Notes(
     var content: String,
     var dateModified:Date?,
     var key: String="",
-    var id: Long = 0
+    var id: Long = 0,
+    var archived: Boolean = false
 )

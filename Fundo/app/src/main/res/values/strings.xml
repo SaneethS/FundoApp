@@ -51,5 +51,6 @@
     <string name="drawer_label_name">Labels</string>
     <string name="create_new_label">Create new Label</string>
     <string name="label">Label</string>
+    <string name="archives">Archives</string>
 
 </resources>

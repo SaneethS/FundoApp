@@ -28,4 +28,14 @@
 
     </group>
 
+    <group
+        android:id="@+id/nav_group_3">
+
+        <item
+            android:id="@+id/archive"
+            android:title="@string/archives"
+            android:icon="@drawable/ic_baseline_archive_24">
+        </item>
+    </group>
+
 </menu>

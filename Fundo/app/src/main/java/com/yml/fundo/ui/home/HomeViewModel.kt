@@ -22,6 +22,9 @@ class HomeViewModel : ViewModel() {
     private val _getNewNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Notes>>
 
+    private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
+
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
 
@@ -65,6 +68,16 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+
+    fun getArchivedNotes(context: Context) {
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getArchiveNotesFromDB()
+            if (resultNotes != null) {
+                _getNewNotesStatus.value = resultNotes
+            }
+        }
+    }
+
 
     fun getUserInfo(context: Context, uid: Long) {
         viewModelScope.launch {

@@ -74,6 +74,16 @@ class MainActivity : AppCompatActivity() {
                 goToLabelCreate()
             }
         }
+
+        sharedViewModel.goToArchiveNotePageStatus.observe(this@MainActivity) {
+            if(it) {
+                goToArchivedNotePage()
+            }
+        }
+    }
+
+    private fun goToArchivedNotePage() {
+        switchFragment(HomePage(true))
     }
 
     private fun goToResetPassword() {
@@ -131,6 +141,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 R.id.labels -> sharedViewModel.setGoToLabelCreateStatus(true)
+                R.id.archive -> sharedViewModel.setGoToArchivedNotePageStatus(true)
             }
             it.isCheckable = true
             binding.drawerLayout.closeDrawer(GravityCompat.START)
