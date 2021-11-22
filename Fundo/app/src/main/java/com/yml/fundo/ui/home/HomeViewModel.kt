@@ -2,6 +2,7 @@ package com.yml.fundo.ui.home
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,9 @@ class HomeViewModel : ViewModel() {
 
     private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
+
+    private val _getReminderNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getReminderNotesStatus = _getReminderNotesStatus as LiveData<ArrayList<Notes>>
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
@@ -72,8 +76,18 @@ class HomeViewModel : ViewModel() {
     fun getArchivedNotes(context: Context) {
         viewModelScope.launch {
             val resultNotes = DatabaseService.getInstance(context).getArchiveNotesFromDB()
+            Log.i("VMService","$resultNotes")
             if (resultNotes != null) {
-                _getNewNotesStatus.value = resultNotes
+                _getArchiveNotesStatus.value = resultNotes
+            }
+        }
+    }
+
+    fun getReminderNotes(context: Context) {
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getReminderNotesFromDB()
+            if (resultNotes != null) {
+                _getReminderNotesStatus.value = resultNotes
             }
         }
     }

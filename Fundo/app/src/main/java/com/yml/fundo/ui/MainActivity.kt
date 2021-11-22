@@ -8,7 +8,7 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
-import com.yml.fundo.common.SharedPref
+import com.yml.fundo.common.*
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.ui.home.HomePage
 import com.yml.fundo.ui.label.LabelCreatePage
@@ -80,10 +80,28 @@ class MainActivity : AppCompatActivity() {
                 goToArchivedNotePage()
             }
         }
+
+        sharedViewModel.goToReminderNotePageStatus.observe(this@MainActivity) {
+            if(it) {
+                goToReminderNotePage()
+            }
+        }
+    }
+
+    private fun goToReminderNotePage() {
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, REMINDER)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToArchivedNotePage() {
-        switchFragment(HomePage(true))
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, ARCHIVE)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToResetPassword() {
@@ -103,7 +121,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToHomePage() {
-        switchFragment(HomePage())
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, HOME)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToNotePage() {
@@ -120,7 +142,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun navigationDrawer() {
         toggle = ActionBarDrawerToggle(
-            this,
+            this@MainActivity,
             binding.drawerLayout,
             binding.homePageToolbar,
             R.string.open,
@@ -136,10 +158,7 @@ class MainActivity : AppCompatActivity() {
             navNotes.isChecked = false
             when (it.itemId) {
                 R.id.notes -> sharedViewModel.setGoToHomePageStatus(true)
-                R.id.reminders -> Toast.makeText(
-                    this, "Reminder selected",
-                    Toast.LENGTH_LONG
-                ).show()
+                R.id.reminders -> sharedViewModel.setGoToReminderNotePageStatus(true)
                 R.id.labels -> sharedViewModel.setGoToLabelCreateStatus(true)
                 R.id.archive -> sharedViewModel.setGoToArchivedNotePageStatus(true)
             }

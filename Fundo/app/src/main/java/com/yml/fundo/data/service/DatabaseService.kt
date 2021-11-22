@@ -134,6 +134,18 @@ class DatabaseService(val context: Context) {
         }
     }
 
+    suspend fun getReminderNotesFromDB(): ArrayList<Notes>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notesList = sqlDb.getReminderNoteFromDB()
+                notesList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
 
     suspend fun updateNewNoteInDB(notes: Notes, user: User): Boolean {
         return withContext(Dispatchers.IO) {
@@ -231,6 +243,4 @@ class DatabaseService(val context: Context) {
             }
         }
     }
-
-
 }

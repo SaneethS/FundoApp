@@ -34,6 +34,38 @@
             android:layout_alignLeft="@+id/list_title">
         </TextView>
 
+        <RelativeLayout
+            android:id="@+id/reminderLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_below="@id/list_note"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="32dp"
+            android:background="@drawable/toolbar_layout"
+            android:backgroundTint="@color/Goldenrod"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/clockIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:src="@drawable/clock_icon" />
+
+            <TextView
+                android:id="@+id/reminderTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@id/clockIcon"
+                android:text="Tomorrow, 8:00 am"
+                android:textColor="@color/white"/>
+        </RelativeLayout>
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
