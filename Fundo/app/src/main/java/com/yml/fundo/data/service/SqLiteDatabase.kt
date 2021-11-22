@@ -57,7 +57,8 @@ class SqLiteDatabase(context: Context) {
                 content = notes.content,
                 dateModified = notes.dateModified,
                 nid = notes.id,
-                archived = notes.archived
+                archived = notes.archived,
+                reminder = notes.reminder
             )
             notes.id = notesDao.addNewNoteToDB(noteEntity)
             if (!onlineStatus) {
@@ -76,7 +77,7 @@ class SqLiteDatabase(context: Context) {
                 val notesKey = Notes(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
-                    archived = i.archived
+                    archived = i.archived, reminder = i.reminder
                 )
                 notesList.add(notesKey)
             }
@@ -88,7 +89,8 @@ class SqLiteDatabase(context: Context) {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
-                dateModified = notes.dateModified, nid = notes.id, archived = notes.archived
+                dateModified = notes.dateModified, nid = notes.id, archived = notes.archived,
+                reminder = notes.reminder
             )
             notesDao.updateNewNoteInDB(noteEntity)
             if (!onlineStatus) {
@@ -104,7 +106,7 @@ class SqLiteDatabase(context: Context) {
             val noteEntity = NotesEntity(
                 fNid = notes.key, title = notes.title, content = notes.content,
                 dateModified = notes.dateModified, nid = notes.id,
-                archived = notes.archived
+                archived = notes.archived, reminder = notes.reminder
             )
             notesDao.deleteNoteFromDB(noteEntity)
             if (!onlineStatus) {
@@ -134,7 +136,7 @@ class SqLiteDatabase(context: Context) {
         operationDao.deleteOp()
     }
 
-    suspend fun clearAllTables() {
+    fun clearAllTables() {
         localDatabase.clearAllTables()
     }
 
@@ -146,7 +148,28 @@ class SqLiteDatabase(context: Context) {
                 val notesKey = Notes(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
-                    archived = i.archived
+                    archived = i.archived, reminder = i.reminder
+                )
+                try{
+                    notesList.add(notesKey)
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
+            }
+            notesList
+//            return@withContext ArrayList(notesDao.getArchivedNoteFromDB().map { it.toNotes() })
+        }
+    }
+
+    suspend fun getReminderNoteFromDB(): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
+            val notesEntity = notesDao.getReminderNotes()
+            val notesList = arrayListOf<Notes>()
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived, reminder = i.reminder
                 )
                 notesList.add(notesKey)
             }

@@ -80,10 +80,20 @@ class MainActivity : AppCompatActivity() {
                 goToArchivedNotePage()
             }
         }
+
+        sharedViewModel.goToReminderNotePageStatus.observe(this@MainActivity) {
+            if(it) {
+                goToReminderNotePage()
+            }
+        }
+    }
+
+    private fun goToReminderNotePage() {
+        switchFragment(HomePage(reminder = true))
     }
 
     private fun goToArchivedNotePage() {
-        switchFragment(HomePage(true))
+        switchFragment(HomePage(archived = true))
     }
 
     private fun goToResetPassword() {
@@ -120,7 +130,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun navigationDrawer() {
         toggle = ActionBarDrawerToggle(
-            this,
+            this@MainActivity,
             binding.drawerLayout,
             binding.homePageToolbar,
             R.string.open,
@@ -136,10 +146,7 @@ class MainActivity : AppCompatActivity() {
             navNotes.isChecked = false
             when (it.itemId) {
                 R.id.notes -> sharedViewModel.setGoToHomePageStatus(true)
-                R.id.reminders -> Toast.makeText(
-                    this, "Reminder selected",
-                    Toast.LENGTH_LONG
-                ).show()
+                R.id.reminders -> sharedViewModel.setGoToReminderNotePageStatus(true)
                 R.id.labels -> sharedViewModel.setGoToLabelCreateStatus(true)
                 R.id.archive -> sharedViewModel.setGoToArchivedNotePageStatus(true)
             }

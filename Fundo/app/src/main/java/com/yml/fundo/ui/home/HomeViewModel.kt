@@ -25,6 +25,9 @@ class HomeViewModel : ViewModel() {
     private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
 
+    private val _getReminderNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getReminderNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
+
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
 
@@ -73,7 +76,16 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             val resultNotes = DatabaseService.getInstance(context).getArchiveNotesFromDB()
             if (resultNotes != null) {
-                _getNewNotesStatus.value = resultNotes
+                _getArchiveNotesStatus.value = resultNotes
+            }
+        }
+    }
+
+    fun getReminderNotes(context: Context) {
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getReminderNotesFromDB()
+            if (resultNotes != null) {
+                _getReminderNotesStatus.value = resultNotes
             }
         }
     }

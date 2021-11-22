@@ -31,7 +31,9 @@ import com.yml.fundo.ui.wrapper.Notes
 import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.ui.note.NotePage
 
-class HomePage(private var archived: Boolean = false) : Fragment(R.layout.home_page) {
+class HomePage(private var archived: Boolean = false,
+               private  var reminder: Boolean = false)
+    : Fragment(R.layout.home_page) {
     private lateinit var binding: HomePageBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var homeViewModel: HomeViewModel
@@ -138,6 +140,7 @@ class HomePage(private var archived: Boolean = false) : Fragment(R.layout.home_p
                 bundle.putLong("id", note.id)
                 bundle.putString("dateModified", dateTime)
                 bundle.putBoolean("archived", note.archived)
+                bundle.putString("reminder", DateTypeConverter().fromOffsetDateTime(note.reminder))
                 val notePage = NotePage()
                 notePage.arguments = bundle
                 requireActivity().supportFragmentManager.beginTransaction()
@@ -152,9 +155,13 @@ class HomePage(private var archived: Boolean = false) : Fragment(R.layout.home_p
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = myAdapter
-        if(archived){
+        if (archived) {
             homeViewModel.getArchivedNotes(requireContext())
-        }else{
+        }
+        else if (reminder) {
+            homeViewModel.getReminderNotes(requireContext())
+        }
+        else {
             homeViewModel.getNewNotes(requireContext())
         }
 
@@ -165,6 +172,12 @@ class HomePage(private var archived: Boolean = false) : Fragment(R.layout.home_p
         }
 
         homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
+            notesList.clear()
+            notesList.addAll(it)
+            myAdapter.notifyDataSetChanged()
+        }
+
+        homeViewModel.getReminderNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
             myAdapter.notifyDataSetChanged()

@@ -4,5 +4,6 @@ data class FirebaseNotes(
     var title: String,
     var content: String,
     var dateModified: String,
-    var archived: Boolean
+    var archived: Boolean,
+    var reminder: String = ""
 )
