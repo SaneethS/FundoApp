@@ -94,14 +94,14 @@ class FirebaseDatabase {
                         if (dataSnapshot != null) {
                             for (item in dataSnapshot.documents) {
                                 val noteHashMap = item.data as HashMap<*, *>
-                                val reminder = DateTypeConverter().toOffsetDateTime(noteHashMap["reminder"] as String?)
+                                val reminder = DateTypeConverter().toOffsetDateTime(noteHashMap["reminder"] as String?).toString()
                                 val note = Notes(
                                     noteHashMap["title"].toString(),
                                     noteHashMap["content"].toString(),
                                     dateModified = DateTypeConverter().toOffsetDateTime(noteHashMap["dateModified"].toString()) as Date,
                                     item.id,
                                     archived = noteHashMap["archived"] as Boolean,
-                                    reminder = reminder
+                                    reminder = reminder as Date
                                 )
                                 noteList.add(note)
                             }

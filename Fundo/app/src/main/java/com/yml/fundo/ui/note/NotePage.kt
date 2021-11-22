@@ -48,7 +48,11 @@ class NotePage : Fragment(R.layout.note_page) {
         noteViewModel.getUserInfo(requireContext(), userId)
 
         binding.backButton.setOnClickListener {
-            sharedViewModel.setGoToHomePageStatus(true)
+            if(bundleArchived == true) {
+                sharedViewModel.setGoToArchivedNotePageStatus(true)
+            }else{
+                sharedViewModel.setGoToHomePageStatus(true)
+            }
         }
 
         binding.saveNoteButton.setOnClickListener {
@@ -119,6 +123,12 @@ class NotePage : Fragment(R.layout.note_page) {
     }
 
     private fun reminderNotes() {
+        if(bundleReminder != null) {
+            binding.reminderLayout.visibility = View.VISIBLE
+            val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
+            val date = formatter.format(bundleReminder)
+            binding.reminderTextView.text = date
+        }
         binding.reminderButton.setOnClickListener {
             val currentDateTime = Calendar.getInstance()
             val startYear = currentDateTime.get(Calendar.YEAR)

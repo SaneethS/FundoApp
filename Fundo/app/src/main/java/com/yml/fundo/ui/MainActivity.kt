@@ -8,7 +8,7 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
-import com.yml.fundo.common.SharedPref
+import com.yml.fundo.common.*
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.ui.home.HomePage
 import com.yml.fundo.ui.label.LabelCreatePage
@@ -89,11 +89,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToReminderNotePage() {
-        switchFragment(HomePage(reminder = true))
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, REMINDER)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToArchivedNotePage() {
-        switchFragment(HomePage(archived = true))
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, ARCHIVE)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToResetPassword() {
@@ -113,7 +121,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToHomePage() {
-        switchFragment(HomePage())
+        val bundle = Bundle()
+        val homepage = HomePage()
+        bundle.putString(TYPE, HOME)
+        homepage.arguments = bundle
+        switchFragment(homepage)
     }
 
     private fun goToNotePage() {

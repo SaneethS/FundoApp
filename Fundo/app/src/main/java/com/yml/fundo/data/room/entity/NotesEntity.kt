@@ -1,8 +1,6 @@
 package com.yml.fundo.data.room.entity
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
 import androidx.room.PrimaryKey
 import com.yml.fundo.ui.wrapper.Notes
 import java.util.*

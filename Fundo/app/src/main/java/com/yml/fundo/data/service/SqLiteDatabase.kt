@@ -143,6 +143,7 @@ class SqLiteDatabase(context: Context) {
     suspend fun getArchiveNoteFromDB(): ArrayList<Notes> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getArchivedNoteFromDB()
+            Log.i("SQLService","$notesEntity")
             val notesList = arrayListOf<Notes>()
             for (i in notesEntity) {
                 val notesKey = Notes(
@@ -156,7 +157,7 @@ class SqLiteDatabase(context: Context) {
                     e.printStackTrace()
                 }
             }
-            notesList
+            return@withContext notesList
 //            return@withContext ArrayList(notesDao.getArchivedNoteFromDB().map { it.toNotes() })
         }
     }

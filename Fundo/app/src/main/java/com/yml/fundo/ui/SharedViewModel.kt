@@ -30,7 +30,7 @@ class SharedViewModel : ViewModel() {
     val goToArchiveNotePageStatus = _goToArchivedNotePageStatus as LiveData<Boolean>
 
     private val _goToReminderNotePageStatus = MutableLiveData<Boolean>()
-    val goToReminderNotePageStatus = _goToArchivedNotePageStatus as LiveData<Boolean>
+    val goToReminderNotePageStatus = _goToReminderNotePageStatus as LiveData<Boolean>
 
     fun setGoToHomePageStatus(status: Boolean) {
         _goToHomePageStatus.value = status

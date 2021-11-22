@@ -19,7 +19,7 @@ class DateTypeConverter {
         }
 
     @TypeConverter
-    fun fromOffsetDateTime(date: Date?): String? =
+    fun fromOffsetDateTime(date: Date?): String =
         date?.let { formatter.format(date) } ?: ""
 
     companion object {

@@ -22,17 +22,19 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
+import com.yml.fundo.common.ARCHIVE
+import com.yml.fundo.common.REMINDER
 import com.yml.fundo.ui.home.adapter.MyAdapter
 import com.yml.fundo.databinding.HomePageBinding
 import com.yml.fundo.common.SharedPref
+import com.yml.fundo.common.TYPE
 import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.ui.SharedViewModel
 import com.yml.fundo.ui.wrapper.Notes
 import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.ui.note.NotePage
 
-class HomePage(private var archived: Boolean = false,
-               private  var reminder: Boolean = false)
+class HomePage
     : Fragment(R.layout.home_page) {
     private lateinit var binding: HomePageBinding
     private lateinit var sharedViewModel: SharedViewModel
@@ -42,15 +44,17 @@ class HomePage(private var archived: Boolean = false,
     private lateinit var dialogView: View
     private lateinit var recyclerView: RecyclerView
     private lateinit var myAdapter: MyAdapter
+    private lateinit var type: String
     private var menu: Menu? = null
     private var userId: Long = 0L
+    private var notesList = ArrayList<Notes>()
+    private var currentUser: User =
+        User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
+
 
     companion object {
         private const val STORAGE_PERMISSION_RESULTCODE = 0
         private const val PICK_IMAGE_RESULTCODE = 1
-        private var notesList = ArrayList<Notes>()
-        private var currentUser: User =
-            User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -66,6 +70,7 @@ class HomePage(private var archived: Boolean = false,
 
         (requireActivity() as AppCompatActivity).supportActionBar?.show()
         setHasOptionsMenu(true)
+        type = arguments?.getString(TYPE).toString()
 
         userId = SharedPref.getId()
 
@@ -97,7 +102,7 @@ class HomePage(private var archived: Boolean = false,
     }
 
     private fun checkVisibility() {
-        if(archived) {
+        if(type == ARCHIVE || type == REMINDER) {
             binding.homeFab.visibility = View.GONE
         }
     }
@@ -155,32 +160,42 @@ class HomePage(private var archived: Boolean = false,
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = myAdapter
-        if (archived) {
-            homeViewModel.getArchivedNotes(requireContext())
-        }
-        else if (reminder) {
-            homeViewModel.getReminderNotes(requireContext())
-        }
-        else {
-            homeViewModel.getNewNotes(requireContext())
+
+        when(type) {
+            ARCHIVE -> {
+                homeViewModel.getArchivedNotes(requireContext())
+            }
+            REMINDER -> {
+                homeViewModel.getReminderNotes(requireContext())
+            }
+            else -> {
+                homeViewModel.getNewNotes(requireContext())
+            }
         }
 
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
-            notesList.clear()
-            notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
+            Log.i("archiveVM", "control is here in home")
+            if( it != null ){
+                notesList.clear()
+                notesList.addAll(it)
+                myAdapter.notifyDataSetChanged()
+            }
         }
 
         homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
-            notesList.clear()
-            notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
+            if( it != null ){
+                notesList.clear()
+                notesList.addAll(it)
+                myAdapter.notifyDataSetChanged()
+            }
         }
 
         homeViewModel.getReminderNotesStatus.observe(viewLifecycleOwner) {
-            notesList.clear()
-            notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
+            if( it != null ){
+                notesList.clear()
+                notesList.addAll(it)
+                myAdapter.notifyDataSetChanged()
+            }
         }
     }
 
