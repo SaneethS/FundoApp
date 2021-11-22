@@ -1,5 +1,6 @@
 package com.yml.fundo.ui.note
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Build
@@ -137,7 +138,7 @@ class NotePage : Fragment(R.layout.note_page) {
             val startHour = currentDateTime.get(Calendar.HOUR_OF_DAY)
             val startMinute = currentDateTime.get(Calendar.MINUTE)
 
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 requireContext(), { _, year, month, day ->
                     TimePickerDialog(requireContext(), { _, hour, minute ->
                         val selectDateTime = Calendar.getInstance()
@@ -164,7 +165,30 @@ class NotePage : Fragment(R.layout.note_page) {
                 startYear,
                 startMonth,
                 startDay
-            ).show()
+            )
+
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis()
+            datePickerDialog.show()
+        }
+
+        binding.reminderLayout.setOnClickListener {
+            val alertDialog = AlertDialog.Builder(requireContext())
+                .setMessage("Do you want to delete the reminder?")
+                .setPositiveButton("Yes") {
+                    _, _ ->
+                    val title = binding.titleText.text.toString()
+                    val content = binding.noteText.text.toString()
+                    val note =
+                        Notes(title, content, dateModified = bundleDateModified, noteKey,
+                            bundleNoteId!!, archived = bundleArchived!!, reminder = null)
+                    noteViewModel.updateNotes(requireContext(), note, currentUser)
+                    binding.reminderLayout.visibility = View.GONE
+                }
+                .setNegativeButton("No") {
+                    _, _  ->
+                }.create()
+
+            alertDialog.show()
         }
     }
 
