@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yml.fundo.R
 import com.yml.fundo.ui.wrapper.Notes
+import java.text.SimpleDateFormat
 
 class MyAdapter(private val notesList: ArrayList<Notes>) :
     RecyclerView.Adapter<MyAdapter.MyViewHolder>(), Filterable {
@@ -41,6 +43,15 @@ class MyAdapter(private val notesList: ArrayList<Notes>) :
         val item = tempNotesList[position]
         holder.title.text = item.title
         holder.content.text = item.content
+
+        if(item.reminder != null){
+            holder.reminderLayout.visibility = View.VISIBLE
+            val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
+            val date = formatter.format(item.reminder)
+            holder.reminderText.text = date
+        }else {
+            holder.reminderLayout.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int {
@@ -50,6 +61,8 @@ class MyAdapter(private val notesList: ArrayList<Notes>) :
     class MyViewHolder(view: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.list_title)
         val content: TextView = view.findViewById(R.id.list_note)
+        val reminderLayout: RelativeLayout = view.findViewById(R.id.reminderLayout)
+        val reminderText: TextView = view.findViewById(R.id.reminderTextView)
 
         init {
             itemView.setOnClickListener {

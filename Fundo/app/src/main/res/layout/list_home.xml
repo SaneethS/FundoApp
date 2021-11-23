@@ -41,11 +41,9 @@
             android:padding="8dp"
             android:layout_below="@id/list_note"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="32dp"
             android:background="@drawable/toolbar_layout"
-            android:backgroundTint="@color/Goldenrod"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
+            android:backgroundTint="@color/white"
+            android:layout_alignStart="@+id/list_note"
             android:visibility="gone">
 
             <ImageView
@@ -63,7 +61,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_toEndOf="@id/clockIcon"
                 android:text="Tomorrow, 8:00 am"
-                android:textColor="@color/white"/>
+                android:textColor="@color/black"/>
         </RelativeLayout>
 
     </RelativeLayout>
