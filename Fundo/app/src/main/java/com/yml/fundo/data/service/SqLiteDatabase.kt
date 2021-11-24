@@ -85,6 +85,72 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
+    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
+            val notesEntity = notesDao.getPagedNote(limit, offset)
+            val notesList = arrayListOf<Notes>()
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived, reminder = i.reminder
+                )
+                notesList.add(notesKey)
+            }
+            notesList
+        }
+    }
+
+    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
+            val notesEntity = notesDao.getArchivePaged(limit, offset)
+            val notesList = arrayListOf<Notes>()
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived, reminder = i.reminder
+                )
+                notesList.add(notesKey)
+            }
+            notesList
+        }
+    }
+
+    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Notes> {
+        return withContext(Dispatchers.IO) {
+            val notesEntity = notesDao.getReminderPaged(limit, offset)
+            val notesList = arrayListOf<Notes>()
+            for (i in notesEntity) {
+                val notesKey = Notes(
+                    title = i.title, content = i.content,
+                    key = i.fNid, dateModified = i.dateModified, id = i.nid,
+                    archived = i.archived, reminder = i.reminder
+                )
+                notesList.add(notesKey)
+            }
+            notesList
+        }
+    }
+
+    suspend fun getNoteCount(): Int {
+        return withContext(Dispatchers.IO) {
+            return@withContext notesDao.getNoteCount()
+        }
+    }
+
+    suspend fun getArchiveCount(): Int {
+        return withContext(Dispatchers.IO) {
+            return@withContext notesDao.getArchiveCount()
+        }
+    }
+
+    suspend fun getReminderCount(): Int {
+        return withContext(Dispatchers.IO) {
+            return@withContext notesDao.getReminderCount()
+        }
+    }
+
     suspend fun updateNewNoteInDB(notes: Notes, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
