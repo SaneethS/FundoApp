@@ -81,9 +81,8 @@ class HomePage
         profilePage()
         userData()
         setUserDetails()
-        homeViewModel.getNotesCount(requireContext())
-        homeViewModel.getArchiveCount(requireContext())
-        homeViewModel.getReminderCount(requireContext())
+        notesCount()
+
 
         binding.homeFab.setOnClickListener {
             sharedViewModel.setGoToNotePageStatus(true)
@@ -104,6 +103,21 @@ class HomePage
         myRecyclerView()
         noteClick()
         checkVisibility()
+    }
+
+    private fun notesCount() {
+        when(type){
+            ARCHIVE -> {
+                homeViewModel.getArchiveCount(requireContext())
+            }
+            REMINDER ->  {
+                homeViewModel.getReminderCount(requireContext())
+            }
+            else -> {
+                homeViewModel.getNotesCount(requireContext())
+            }
+        }
+
     }
 
     private fun checkVisibility() {
@@ -177,7 +191,7 @@ class HomePage
                     val firstItemPosition = firstItemPositionArray[0]
 
                     Log.i("recyclerScroll", "$totalNotes")
-                    if((visibleItemCount + firstItemPosition >= totalItem) && (totalItem < totalNotes)) {
+                    if(((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
                         when(type) {
                             ARCHIVE -> {
@@ -198,7 +212,7 @@ class HomePage
                     val firstItemPosition = layoutManager.findFirstVisibleItemPosition()
 
                     Log.i("recyclerScroll", "$totalNotes")
-                    if((visibleItemCount + firstItemPosition >= totalItem) && (totalItem < totalNotes)) {
+                    if(((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
                         when(type) {
                             ARCHIVE -> {
@@ -232,12 +246,10 @@ class HomePage
 
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
             Log.i("archiveVM", "control is here in home")
-            if( it != null ){
-                notesList.clear()
-                notesList.addAll(it)
-                homeViewModel.getNotesCount(requireContext())
-                myAdapter.notifyDataSetChanged()
-            }
+            notesList.clear()
+            notesList.addAll(it)
+            homeViewModel.getNotesCount(requireContext())
+            myAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getPagedNotesStatus.observe(viewLifecycleOwner) {
@@ -252,12 +264,10 @@ class HomePage
         }
 
         homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
-            if( it != null ){
-                notesList.clear()
-                notesList.addAll(it)
-                homeViewModel.getArchiveCount(requireContext())
-                myAdapter.notifyDataSetChanged()
-            }
+            notesList.clear()
+            notesList.addAll(it)
+            homeViewModel.getArchiveCount(requireContext())
+            myAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getArchiveCount.observe(viewLifecycleOwner) {
@@ -272,12 +282,10 @@ class HomePage
         }
 
         homeViewModel.getReminderNotesStatus.observe(viewLifecycleOwner) {
-            if( it != null ){
-                notesList.clear()
-                notesList.addAll(it)
-                homeViewModel.getReminderCount(requireContext())
-                myAdapter.notifyDataSetChanged()
-            }
+            notesList.clear()
+            notesList.addAll(it)
+            homeViewModel.getReminderCount(requireContext())
+            myAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getReminderCount.observe(viewLifecycleOwner) {
