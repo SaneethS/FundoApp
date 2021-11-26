@@ -45,8 +45,8 @@ class HomePage
     private lateinit var recyclerView: RecyclerView
     private lateinit var myAdapter: MyAdapter
     private lateinit var type: String
-    private var isLoading:Boolean = false
-    private var totalNotes:Int = 0
+    private var isLoading: Boolean = false
+    private var totalNotes: Int = 0
     private var menu: Menu? = null
     private var userId: Long = 0L
     private var notesList = ArrayList<Notes>()
@@ -106,11 +106,11 @@ class HomePage
     }
 
     private fun notesCount() {
-        when(type){
+        when (type) {
             ARCHIVE -> {
                 homeViewModel.getArchiveCount(requireContext())
             }
-            REMINDER ->  {
+            REMINDER -> {
                 homeViewModel.getReminderCount(requireContext())
             }
             else -> {
@@ -121,7 +121,7 @@ class HomePage
     }
 
     private fun checkVisibility() {
-        if(type == ARCHIVE || type == REMINDER) {
+        if (type == ARCHIVE || type == REMINDER) {
             binding.homeFab.visibility = View.GONE
         }
     }
@@ -179,11 +179,11 @@ class HomePage
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
 
-        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if(recyclerView.layoutManager is StaggeredGridLayoutManager){
+                if (recyclerView.layoutManager is StaggeredGridLayoutManager) {
                     val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                     val visibleItemCount = layoutManager.childCount
                     val totalItem = layoutManager.itemCount
@@ -191,9 +191,10 @@ class HomePage
                     val firstItemPosition = firstItemPositionArray[0]
 
                     Log.i("recyclerScroll", "$totalNotes")
-                    if(((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
+                    if (((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
-                        when(type) {
+                        notesLoader()
+                        when (type) {
                             ARCHIVE -> {
                                 homeViewModel.getArchivePaged(requireContext(), 10, totalItem)
                             }
@@ -205,16 +206,17 @@ class HomePage
                             }
                         }
                     }
-                }else {
+                } else {
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     val visibleItemCount = layoutManager.childCount
                     val totalItem = layoutManager.itemCount
                     val firstItemPosition = layoutManager.findFirstVisibleItemPosition()
 
                     Log.i("recyclerScroll", "$totalNotes")
-                    if(((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
+                    if (((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
-                        when(type) {
+                        notesLoader()
+                        when (type) {
                             ARCHIVE -> {
                                 homeViewModel.getArchivePaged(requireContext(), 10, totalItem)
                             }
@@ -232,7 +234,7 @@ class HomePage
 
         recyclerView.adapter = myAdapter
 
-        when(type) {
+        when (type) {
             ARCHIVE -> {
                 homeViewModel.getArchivedNotes(requireContext())
             }
@@ -244,8 +246,13 @@ class HomePage
             }
         }
 
+        notesObserver()
+        archivedObserver()
+        reminderObserver()
+    }
+
+    private fun notesObserver() {
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
-            Log.i("archiveVM", "control is here in home")
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getNotesCount(requireContext())
@@ -262,7 +269,9 @@ class HomePage
         homeViewModel.getNoteCount.observe(viewLifecycleOwner) {
             totalNotes = it
         }
+    }
 
+    private fun archivedObserver() {
         homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
@@ -280,7 +289,9 @@ class HomePage
             myAdapter.notifyDataSetChanged()
             notesLoader()
         }
+    }
 
+    private fun reminderObserver() {
         homeViewModel.getReminderNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
@@ -301,9 +312,9 @@ class HomePage
     }
 
     private fun notesLoader() {
-        if(isLoading) {
+        if (isLoading) {
             binding.recyclerProgressBar.visibility = View.VISIBLE
-        }else {
+        } else {
             binding.recyclerProgressBar.visibility = View.GONE
         }
     }
