@@ -110,6 +110,73 @@ class DatabaseService(val context: Context) {
         }
     }
 
+    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Notes>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notesList = sqlDb.getPagedNote(limit, offset)
+                notesList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Notes>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notesList = sqlDb.getArchivePaged(limit, offset)
+                notesList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Notes>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val notesList = sqlDb.getReminderPaged(limit, offset)
+                notesList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    suspend fun getNoteCount(): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                sqlDb.getNoteCount()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                0
+            }
+        }
+    }
+
+    suspend fun getArchiveCount(): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                sqlDb.getArchiveCount()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                0
+            }
+        }
+    }
+
+    suspend fun getReminderCount(): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                sqlDb.getReminderCount()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                0
+            }
+        }
+    }
+
     suspend fun getArchiveNotesFromDB(): ArrayList<Notes>? {
         return withContext(Dispatchers.IO) {
             try {

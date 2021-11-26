@@ -23,11 +23,29 @@ class HomeViewModel : ViewModel() {
     private val _getNewNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Notes>>
 
+    private val _getPagedNotesStatus = MutableLiveData<ArrayList<Notes>>()
+    val getPagedNotesStatus = _getPagedNotesStatus as LiveData<ArrayList<Notes>>
+
+    private val _getNoteCount = MutableLiveData<Int>()
+    val getNoteCount = _getNoteCount as LiveData<Int>
+
+    private val _getArchiveCount = MutableLiveData<Int>()
+    val getArchiveCount = _getArchiveCount as LiveData<Int>
+
+    private val _getReminderCount = MutableLiveData<Int>()
+    val getReminderCount = _getReminderCount as LiveData<Int>
+
     private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
 
+    private val _getArchivePagedStatus = MutableLiveData<ArrayList<Notes>>()
+    val getArchivePagedStatus = _getArchivePagedStatus as LiveData<ArrayList<Notes>>
+
     private val _getReminderNotesStatus = MutableLiveData<ArrayList<Notes>>()
     val getReminderNotesStatus = _getReminderNotesStatus as LiveData<ArrayList<Notes>>
+
+    private val _getReminderPagedStatus = MutableLiveData<ArrayList<Notes>>()
+    val getReminderPagedStatus = _getReminderPagedStatus as LiveData<ArrayList<Notes>>
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
@@ -66,16 +84,46 @@ class HomeViewModel : ViewModel() {
 
     fun getNewNotes(context: Context) {
         viewModelScope.launch {
-            val resultNotes = DatabaseService.getInstance(context).getNewNoteFromDB()
+            val resultNotes = DatabaseService.getInstance(context).getPagedNote(10, 0)
             if (resultNotes != null) {
                 _getNewNotesStatus.value = resultNotes
             }
         }
     }
 
+    fun getPagedNotes(context: Context, limit: Int, offset: Int){
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getPagedNote(limit, offset)
+            if (resultNotes != null) {
+                _getPagedNotesStatus.value = resultNotes
+            }
+        }
+    }
+
+    fun getNotesCount(context: Context) {
+        viewModelScope.launch {
+            val totalCount = DatabaseService.getInstance(context).getNoteCount()
+            _getNoteCount.value = totalCount
+        }
+    }
+
+    fun getArchiveCount(context: Context) {
+        viewModelScope.launch {
+            val totalCount = DatabaseService.getInstance(context).getArchiveCount()
+            _getArchiveCount.value = totalCount
+        }
+    }
+
+    fun getReminderCount(context: Context) {
+        viewModelScope.launch {
+            val totalCount = DatabaseService.getInstance(context).getReminderCount()
+            _getReminderCount.value = totalCount
+        }
+    }
+
     fun getArchivedNotes(context: Context) {
         viewModelScope.launch {
-            val resultNotes = DatabaseService.getInstance(context).getArchiveNotesFromDB()
+            val resultNotes = DatabaseService.getInstance(context).getArchivePaged(10,0)
             Log.i("VMService","$resultNotes")
             if (resultNotes != null) {
                 _getArchiveNotesStatus.value = resultNotes
@@ -83,11 +131,29 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    fun getArchivePaged(context: Context, limit: Int, offset: Int){
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getArchivePaged(limit, offset)
+            if(resultNotes != null) {
+                _getArchivePagedStatus.value = resultNotes
+            }
+        }
+    }
+
     fun getReminderNotes(context: Context) {
         viewModelScope.launch {
-            val resultNotes = DatabaseService.getInstance(context).getReminderNotesFromDB()
+            val resultNotes = DatabaseService.getInstance(context).getReminderPaged(10,0)
             if (resultNotes != null) {
                 _getReminderNotesStatus.value = resultNotes
+            }
+        }
+    }
+
+    fun getReminderPaged(context: Context, limit: Int, offset: Int){
+        viewModelScope.launch {
+            val resultNotes = DatabaseService.getInstance(context).getReminderPaged(limit, offset)
+            if(resultNotes != null) {
+                _getReminderPagedStatus.value = resultNotes
             }
         }
     }

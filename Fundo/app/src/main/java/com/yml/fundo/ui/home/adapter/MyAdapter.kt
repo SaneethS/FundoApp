@@ -17,6 +17,7 @@ class MyAdapter(private val notesList: ArrayList<Notes>) :
 
     private lateinit var clickListener: OnItemClickListener
     private var tempNotesList = ArrayList<Notes>()
+    private var isLoading = false
 
     init {
         tempNotesList = notesList
@@ -38,6 +39,7 @@ class MyAdapter(private val notesList: ArrayList<Notes>) :
         )
         return MyViewHolder(itemView, clickListener)
     }
+
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val item = tempNotesList[position]
