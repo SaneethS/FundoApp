@@ -32,9 +32,9 @@ import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.ui.SharedViewModel
 import com.yml.fundo.ui.wrapper.Notes
 import com.yml.fundo.ui.wrapper.User
-import com.yml.fundo.ui.note.NotePage
+import com.yml.fundo.ui.note.NoteFragment
 
-class HomePage
+class HomeFragment
     : Fragment(R.layout.home_page) {
     private lateinit var binding: HomePageBinding
     private lateinit var sharedViewModel: SharedViewModel
@@ -165,7 +165,7 @@ class HomePage
                 bundle.putString("dateModified", dateTime)
                 bundle.putBoolean("archived", note.archived)
                 bundle.putString("reminder", DateTypeConverter().fromOffsetDateTime(note.reminder))
-                val notePage = NotePage()
+                val notePage = NoteFragment()
                 notePage.arguments = bundle
                 requireActivity().supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_view, notePage).commit()

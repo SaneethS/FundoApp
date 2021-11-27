@@ -23,7 +23,7 @@ import com.yml.fundo.ui.wrapper.User
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NotePage : Fragment(R.layout.note_page) {
+class NoteFragment : Fragment(R.layout.note_page) {
     private lateinit var binding: NotePageBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var noteViewModel: NoteViewModel

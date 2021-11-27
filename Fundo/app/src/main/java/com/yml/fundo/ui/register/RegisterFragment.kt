@@ -12,7 +12,7 @@ import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.common.Validator
 import com.yml.fundo.ui.SharedViewModel
 
-class RegisterPage : Fragment(R.layout.register_page) {
+class RegisterFragment : Fragment(R.layout.register_page) {
 
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var registerViewModel: RegisterViewModel

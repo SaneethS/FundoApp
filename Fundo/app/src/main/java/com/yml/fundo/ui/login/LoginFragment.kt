@@ -17,7 +17,7 @@ import com.yml.fundo.databinding.LoginPageBinding
 import com.yml.fundo.common.Validator
 import com.yml.fundo.ui.SharedViewModel
 
-class LoginPage : Fragment(R.layout.login_page) {
+class LoginFragment : Fragment(R.layout.login_page) {
     private lateinit var binding: LoginPageBinding
     private lateinit var callbackManager: CallbackManager
     private lateinit var sharedViewModel: SharedViewModel

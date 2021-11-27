@@ -1,7 +1,6 @@
 package com.yml.fundo.ui
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -10,13 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
 import com.yml.fundo.common.*
 import com.yml.fundo.databinding.ActivityMainBinding
-import com.yml.fundo.ui.home.HomePage
-import com.yml.fundo.ui.label.LabelCreatePage
-import com.yml.fundo.ui.login.LoginPage
-import com.yml.fundo.ui.note.NotePage
-import com.yml.fundo.ui.register.RegisterPage
-import com.yml.fundo.ui.reset.ResetPassword
-import com.yml.fundo.ui.splash.SplashScreen
+import com.yml.fundo.ui.home.HomeFragment
+import com.yml.fundo.ui.label.LabelCreateFragment
+import com.yml.fundo.ui.login.LoginFragment
+import com.yml.fundo.ui.note.NoteFragment
+import com.yml.fundo.ui.register.RegisterFragment
+import com.yml.fundo.ui.reset.ResetPasswordFragment
+import com.yml.fundo.ui.splash.SplashScreenFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun goToReminderNotePage() {
         val bundle = Bundle()
-        val homepage = HomePage()
+        val homepage = HomeFragment()
         bundle.putString(TYPE, REMINDER)
         homepage.arguments = bundle
         switchFragment(homepage)
@@ -98,42 +97,42 @@ class MainActivity : AppCompatActivity() {
 
     private fun goToArchivedNotePage() {
         val bundle = Bundle()
-        val homepage = HomePage()
+        val homepage = HomeFragment()
         bundle.putString(TYPE, ARCHIVE)
         homepage.arguments = bundle
         switchFragment(homepage)
     }
 
     private fun goToResetPassword() {
-        switchFragment(ResetPassword())
+        switchFragment(ResetPasswordFragment())
     }
 
     private fun goToSplashScreen() {
-        switchFragment(SplashScreen())
+        switchFragment(SplashScreenFragment())
     }
 
     private fun goToRegisterPage() {
-        switchFragment(RegisterPage())
+        switchFragment(RegisterFragment())
     }
 
     private fun goToLoginPage() {
-        switchFragment(LoginPage())
+        switchFragment(LoginFragment())
     }
 
     private fun goToHomePage() {
         val bundle = Bundle()
-        val homepage = HomePage()
+        val homepage = HomeFragment()
         bundle.putString(TYPE, HOME)
         homepage.arguments = bundle
         switchFragment(homepage)
     }
 
     private fun goToNotePage() {
-        switchFragment(NotePage())
+        switchFragment(NoteFragment())
     }
 
     private fun goToLabelCreate() {
-        switchFragment(LabelCreatePage())
+        switchFragment(LabelCreateFragment())
     }
 
     private fun switchFragment(fragment: Fragment) {

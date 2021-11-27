@@ -11,7 +11,7 @@ import com.yml.fundo.databinding.ResetPasswordBinding
 import com.yml.fundo.common.Validator
 import com.yml.fundo.ui.SharedViewModel
 
-class ResetPassword : Fragment(R.layout.reset_password) {
+class ResetPasswordFragment : Fragment(R.layout.reset_password) {
     private lateinit var binding: ResetPasswordBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var resetPasswordViewModel: ResetPasswordViewModel
