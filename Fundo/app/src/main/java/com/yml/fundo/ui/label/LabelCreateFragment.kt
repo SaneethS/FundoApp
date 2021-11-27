@@ -15,7 +15,7 @@ import com.yml.fundo.ui.SharedViewModel
 import com.yml.fundo.ui.wrapper.Label
 import com.yml.fundo.ui.wrapper.User
 
-class LabelCreatePage : Fragment(R.layout.label_creation) {
+class LabelCreateFragment : Fragment(R.layout.label_creation) {
     private lateinit var binding: LabelCreationBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var labelCreateViewModel: LabelCreateViewModel
