@@ -1,8 +1,8 @@
 package com.yml.fundo.ui.note
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.*
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +14,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.yml.fundo.R
+import com.yml.fundo.common.Notification
+import com.yml.fundo.common.Notification.Companion.CHANNEL_ID
+import com.yml.fundo.common.Notification.Companion.CONTENT
+import com.yml.fundo.common.Notification.Companion.NOTIFICATION_ID
+import com.yml.fundo.common.Notification.Companion.TITLE
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.databinding.NotePageBinding
 import com.yml.fundo.data.room.DateTypeConverter
@@ -39,6 +44,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
     private var currentUser: User =
         User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = NotePageBinding.bind(view)
@@ -121,8 +127,10 @@ class NoteFragment : Fragment(R.layout.note_page) {
 
         archiveNotes()
         reminderNotes()
+        createNotificationChannel()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun reminderNotes() {
         if(bundleReminder != null) {
             binding.reminderLayout.visibility = View.VISIBLE
@@ -142,7 +150,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
                 requireContext(), { _, year, month, day ->
                     TimePickerDialog(requireContext(), { _, hour, minute ->
                         val selectDateTime = Calendar.getInstance()
-                        selectDateTime.set(year, month, day, hour, minute)
+                        selectDateTime.set(year, month, day, hour, minute, 0)
                         reminder = selectDateTime.time
                         binding.reminderLayout.visibility = View.VISIBLE
                         val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
@@ -155,6 +163,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
                                 Notes(title, content, dateModified = bundleDateModified, noteKey,
                                     bundleNoteId!!, archived = bundleArchived!!, reminder = reminder)
                             noteViewModel.updateNotes(requireContext(), note, currentUser)
+                            scheduleNotification(title, content, reminder)
                         }
                     },
                         startHour,
@@ -183,6 +192,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
                             bundleNoteId!!, archived = bundleArchived!!, reminder = null)
                     noteViewModel.updateNotes(requireContext(), note, currentUser)
                     binding.reminderLayout.visibility = View.GONE
+                    scheduleNotification(title, content, reminder, cancel = true)
                 }
                 .setNegativeButton("No") {
                     _, _  ->
@@ -279,6 +289,48 @@ class NoteFragment : Fragment(R.layout.note_page) {
                 getString(R.string.updated_successfully_toast),
                 Toast.LENGTH_LONG
             ).show()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        val name = "Fundoo notes notification channel"
+        val desc = "Fundoo notification"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNEL_ID, name, importance)
+        val notificationManager = requireContext()
+            .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun scheduleNotification(title: String, content: String, reminder: Date?,
+                                     cancel: Boolean = false) {
+        val intent = Intent(requireContext().applicationContext, Notification::class.java)
+        intent.putExtra(TITLE, title)
+        intent.putExtra(CONTENT, content)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext().applicationContext,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_MUTABLE
+        )
+
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as
+                AlarmManager
+
+        if(cancel) {
+            alarmManager.cancel(pendingIntent)
+        }else{
+            reminder?.time?.let {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    it,
+                    pendingIntent
+                )
+            }
+            Toast.makeText(requireContext(), "Notification is set at $reminder", Toast.LENGTH_SHORT).show()
         }
     }
 }
