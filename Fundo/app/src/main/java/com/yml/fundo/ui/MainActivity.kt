@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        sharedViewModel.setTopic()
     }
 
     override fun onNewIntent(intent: Intent?) {

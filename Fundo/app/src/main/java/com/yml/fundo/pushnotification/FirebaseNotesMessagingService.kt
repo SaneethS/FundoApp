@@ -18,24 +18,24 @@ const val CHANNEL_NAME = "com.yml.fundo"
 class FirebaseNotesMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        if(remoteMessage.notification != null) {
-            generateNotification(remoteMessage.notification!!.title!!,
+        generateNotification(remoteMessage.notification!!.title!!,
                 remoteMessage.notification!!.body!!)
-        }
     }
 
     private fun generateNotification(title: String, message: String) {
         val newIntent = Intent(this, MainActivity::class.java)
 
         val pendingIntent = PendingIntent.getActivity(this, 0, newIntent,
-                                PendingIntent.FLAG_UPDATE_CURRENT)
+                                PendingIntent.FLAG_ONE_SHOT)
 
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_book_24)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
+            .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
+            .build()
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -45,6 +45,6 @@ class FirebaseNotesMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
 
-        notificationManager.notify(0, notification.build())
+        notificationManager.notify(1, notification)
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yml.fundo.auth.Authentication
+import com.yml.fundo.pushnotification.FirebaseTopicMessaging
 import com.yml.fundo.ui.wrapper.Note
 
 class SharedViewModel : ViewModel() {
@@ -75,5 +76,9 @@ class SharedViewModel : ViewModel() {
 
     fun checkUser(): Boolean {
         return Authentication.getCurrentUser() != null
+    }
+
+    fun setTopic() {
+        FirebaseTopicMessaging.setTopic()
     }
 }
