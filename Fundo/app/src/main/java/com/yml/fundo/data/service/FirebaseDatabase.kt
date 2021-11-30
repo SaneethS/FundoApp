@@ -1,10 +1,7 @@
 package com.yml.fundo.data.service
 
 import android.util.Log
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.ktx.Firebase
 import com.yml.fundo.common.Util
 import com.yml.fundo.data.model.FirebaseLabel
@@ -12,7 +9,7 @@ import com.yml.fundo.data.model.FirebaseNotes
 import com.yml.fundo.data.model.FirebaseUserDetails
 import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.ui.wrapper.Label
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import java.util.*
 import kotlin.collections.ArrayList
@@ -63,9 +60,9 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun addNewNoteToDB(notes: Notes, user: User): Notes {
-        val dateTime = DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString()
-        val notesInfo = FirebaseNotes(notes.title, notes.content, dateTime, notes.archived)
+    suspend fun addNewNoteToDB(note: Note, user: User): Note {
+        val dateTime = DateTypeConverter().fromOffsetDateTime(note.dateModified).toString()
+        val notesInfo = FirebaseNotes(note.title, note.content, dateTime, note.archived)
         return suspendCoroutine { callback ->
             val refId =
                 fireStore.collection("users").document(user.fUid)
@@ -74,8 +71,8 @@ class FirebaseDatabase {
                 .collection("notes").document(refId)
                 .set(notesInfo).addOnCompleteListener {
                     if (it.isSuccessful) {
-                        notes.key = refId
-                        callback.resumeWith(Result.success(notes))
+                        note.key = refId
+                        callback.resumeWith(Result.success(note))
                     } else {
                         callback.resumeWith(Result.failure(it.exception!!))
                     }
@@ -83,19 +80,19 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun getNewNoteFromDB(user: User): ArrayList<Notes>? {
+    suspend fun getNewNoteFromDB(user: User): ArrayList<Note>? {
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid).collection("notes")
                 .get().addOnCompleteListener {
                     if (it.isSuccessful) {
-                        val noteList = ArrayList<Notes>()
+                        val noteList = ArrayList<Note>()
                         val dataSnapshot = it.result
 
                         if (dataSnapshot != null) {
                             for (item in dataSnapshot.documents) {
                                 val noteHashMap = item.data as HashMap<*, *>
                                 val reminder = DateTypeConverter().toOffsetDateTime(noteHashMap["reminder"] as String?)
-                                val note = Notes(
+                                val note = Note(
                                     noteHashMap["title"].toString(),
                                     noteHashMap["content"].toString(),
                                     dateModified = DateTypeConverter().toOffsetDateTime(noteHashMap["dateModified"].toString()) as Date,
@@ -116,17 +113,17 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun updateNewNoteInDB(notes: Notes, user: User): Boolean {
+    suspend fun updateNewNoteInDB(note: Note, user: User): Boolean {
         val notesMap = mapOf(
-            "title" to notes.title,
-            "content" to notes.content,
-            "dateModified" to DateTypeConverter().fromOffsetDateTime(notes.dateModified).toString(),
-            "archived" to notes.archived,
-            "reminder" to DateTypeConverter().fromOffsetDateTime(notes.reminder).toString()
+            "title" to note.title,
+            "content" to note.content,
+            "dateModified" to DateTypeConverter().fromOffsetDateTime(note.dateModified).toString(),
+            "archived" to note.archived,
+            "reminder" to DateTypeConverter().fromOffsetDateTime(note.reminder).toString()
         )
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid).collection("notes")
-                .document(notes.key).update(notesMap)
+                .document(note.key).update(notesMap)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         callback.resumeWith(Result.success(true))
@@ -137,10 +134,10 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: Notes, user: User): Boolean {
+    suspend fun deleteNoteFromDB(note: Note, user: User): Boolean {
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid).collection("notes")
-                .document(notes.key).delete().addOnCompleteListener {
+                .document(note.key).delete().addOnCompleteListener {
                     if (it.isSuccessful) {
                         callback.resumeWith(Result.success(true))
                     } else {

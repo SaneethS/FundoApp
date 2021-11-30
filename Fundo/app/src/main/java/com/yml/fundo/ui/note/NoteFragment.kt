@@ -2,7 +2,6 @@ package com.yml.fundo.ui.note
 
 import android.app.*
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,20 +12,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.yml.fundo.R
-import com.yml.fundo.common.Notification
-import com.yml.fundo.common.Notification.Companion.CHANNEL_ID
-import com.yml.fundo.common.Notification.Companion.CONTENT
-import com.yml.fundo.common.Notification.Companion.NOTIFICATION_ID
-import com.yml.fundo.common.Notification.Companion.TITLE
-import com.yml.fundo.common.SharedPref
-import com.yml.fundo.databinding.NotePageBinding
+import com.yml.fundo.common.*
 import com.yml.fundo.data.room.DateTypeConverter
+import com.yml.fundo.databinding.NotePageBinding
 import com.yml.fundo.ui.SharedViewModel
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class NoteFragment : Fragment(R.layout.note_page) {
     private lateinit var binding: NotePageBinding
@@ -160,10 +159,10 @@ class NoteFragment : Fragment(R.layout.note_page) {
                             val title = binding.titleText.text.toString()
                             val content = binding.noteText.text.toString()
                             val note =
-                                Notes(title, content, dateModified = bundleDateModified, noteKey,
+                                Note(title, content, dateModified = bundleDateModified, noteKey,
                                     bundleNoteId!!, archived = bundleArchived!!, reminder = reminder)
                             noteViewModel.updateNotes(requireContext(), note, currentUser)
-                            scheduleNotification(title, content, reminder)
+                            scheduleNotification(note)
                         }
                     },
                         startHour,
@@ -188,11 +187,11 @@ class NoteFragment : Fragment(R.layout.note_page) {
                     val title = binding.titleText.text.toString()
                     val content = binding.noteText.text.toString()
                     val note =
-                        Notes(title, content, dateModified = bundleDateModified, noteKey,
+                        Note(title, content, dateModified = bundleDateModified, noteKey,
                             bundleNoteId!!, archived = bundleArchived!!, reminder = null)
                     noteViewModel.updateNotes(requireContext(), note, currentUser)
                     binding.reminderLayout.visibility = View.GONE
-                    scheduleNotification(title, content, reminder, cancel = true)
+                    scheduleNotification(note, cancel = true)
                 }
                 .setNegativeButton("No") {
                     _, _  ->
@@ -215,7 +214,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
                 val title = binding.titleText.text.toString()
                 val content = binding.noteText.text.toString()
                 val note =
-                    Notes(title, content, dateModified = bundleDateModified, noteKey,
+                    Note(title, content, dateModified = bundleDateModified, noteKey,
                         bundleNoteId!!, archived = true, reminder = bundleReminder)
                 noteViewModel.updateNotes(requireContext(), note, currentUser)
 
@@ -223,7 +222,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
                 val title = binding.titleText.text.toString()
                 val content = binding.noteText.text.toString()
                 val note =
-                    Notes(title, content, dateModified = bundleDateModified, noteKey,
+                    Note(title, content, dateModified = bundleDateModified, noteKey,
                         bundleNoteId!!, archived = false, reminder = bundleReminder)
                 noteViewModel.updateNotes(requireContext(), note, currentUser)
             }
@@ -247,7 +246,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
         val content = binding.noteText.text.toString()
         if (title.isNotEmpty() || content.isNotEmpty()) {
             val note =
-                Notes(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!)
+                Note(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!)
             noteViewModel.deleteNotes(requireContext(), note, currentUser)
         } else {
             Toast.makeText(
@@ -276,12 +275,12 @@ class NoteFragment : Fragment(R.layout.note_page) {
         val title = binding.titleText.text.toString()
         val content = binding.noteText.text.toString()
         if (bundleNoteId == null) {
-            val notes = Notes(title, content, dateModified = null)
+            val notes = Note(title, content, dateModified = null)
             Log.i("NoteCurrent", "$currentUser")
             noteViewModel.addNewNote(requireContext(), notes, currentUser)
         } else {
             val note =
-                Notes(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!,
+                Note(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!,
                 bundleArchived!!, bundleReminder)
             noteViewModel.updateNotes(requireContext(), note, currentUser)
             Toast.makeText(
@@ -304,33 +303,28 @@ class NoteFragment : Fragment(R.layout.note_page) {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun scheduleNotification(title: String, content: String, reminder: Date?,
-                                     cancel: Boolean = false) {
-        val intent = Intent(requireContext().applicationContext, Notification::class.java)
-        intent.putExtra(TITLE, title)
-        intent.putExtra(CONTENT, content)
+    private fun scheduleNotification(note: Note, cancel: Boolean = false) {
+        val inputData = Data.Builder()
+            .putString(TITLE, note.title)
+            .putString(CONTENT, note.content)
+            .putString(F_NID, note.key)
+            .putLong(NID, note.id)
+            .putBoolean(ARCHIVED, note.archived)
+            .putString(DATE_MODIFIED, DateTypeConverter().fromOffsetDateTime(note.dateModified))
+            .putString(REMINDER, DateTypeConverter().fromOffsetDateTime(note.reminder))
+            .build()
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            requireContext().applicationContext,
-            NOTIFICATION_ID,
-            intent,
-            PendingIntent.FLAG_MUTABLE
-        )
+        if(!cancel) {
+            val notification = OneTimeWorkRequestBuilder<NotifyWorker>()
+                .setInitialDelay(note.reminder?.time!! - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setInputData(inputData)
+                .addTag(note.title)
+                .build()
 
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as
-                AlarmManager
-
-        if(cancel) {
-            alarmManager.cancel(pendingIntent)
-        }else{
-            reminder?.time?.let {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    it,
-                    pendingIntent
-                )
-            }
-            Toast.makeText(requireContext(), "Notification is set at $reminder", Toast.LENGTH_SHORT).show()
+            WorkManager.getInstance(requireContext()).enqueueUniqueWork(note.key,
+                ExistingWorkPolicy.REPLACE, notification)
+        }else {
+            WorkManager.getInstance(requireContext()).cancelUniqueWork(note.key)
         }
     }
 }

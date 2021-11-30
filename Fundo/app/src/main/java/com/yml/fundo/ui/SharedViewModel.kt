@@ -3,6 +3,8 @@ package com.yml.fundo.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.yml.fundo.auth.Authentication
+import com.yml.fundo.ui.wrapper.Note
 
 class SharedViewModel : ViewModel() {
     private val _goToHomePageStatus = MutableLiveData<Boolean>()
@@ -31,6 +33,9 @@ class SharedViewModel : ViewModel() {
 
     private val _goToReminderNotePageStatus = MutableLiveData<Boolean>()
     val goToReminderNotePageStatus = _goToReminderNotePageStatus as LiveData<Boolean>
+
+    private val _goToExistNotePageStatus = MutableLiveData<Note>()
+    val goToExistNotePageStatus = _goToExistNotePageStatus as LiveData<Note>
 
     fun setGoToHomePageStatus(status: Boolean) {
         _goToHomePageStatus.value = status
@@ -62,5 +67,13 @@ class SharedViewModel : ViewModel() {
 
     fun setGoToReminderNotePageStatus(status: Boolean){
         _goToReminderNotePageStatus.value = status
+    }
+
+    fun setGoToExistingNotePage(note: Note){
+        _goToExistNotePageStatus.value = note
+    }
+
+    fun checkUser(): Boolean {
+        return Authentication.getCurrentUser() != null
     }
 }
