@@ -15,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatToggleButton
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,17 +23,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.yml.fundo.R
-import com.yml.fundo.common.ARCHIVE
-import com.yml.fundo.common.REMINDER
-import com.yml.fundo.ui.home.adapter.MyAdapter
+import com.yml.fundo.common.*
+import com.yml.fundo.ui.home.adapter.NoteAdapter
 import com.yml.fundo.databinding.HomePageBinding
-import com.yml.fundo.common.SharedPref
-import com.yml.fundo.common.TYPE
-import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.ui.SharedViewModel
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.home.adapter.OnItemClickListener
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
-import com.yml.fundo.ui.note.NoteFragment
 
 class HomeFragment
     : Fragment(R.layout.home_page) {
@@ -43,13 +40,13 @@ class HomeFragment
     private lateinit var loading: Dialog
     private lateinit var dialogView: View
     private lateinit var recyclerView: RecyclerView
-    private lateinit var myAdapter: MyAdapter
+    private lateinit var noteAdapter: NoteAdapter
     private lateinit var type: String
     private var isLoading: Boolean = false
     private var totalNotes: Int = 0
     private var menu: Menu? = null
     private var userId: Long = 0L
-    private var notesList = ArrayList<Notes>()
+    private var notesList = ArrayList<Note>()
     private var currentUser: User =
         User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
 
@@ -100,8 +97,8 @@ class HomeFragment
             loading.dismiss()
         }
 
-        myRecyclerView()
-        noteClick()
+        initRecyclerView()
+        setNoteItemClickListener()
         checkVisibility()
     }
 
@@ -152,29 +149,17 @@ class HomeFragment
         email.text = currentUser.email
     }
 
-    private fun noteClick() {
-        myAdapter.setOnItemClickListener(object : MyAdapter.OnItemClickListener {
+    private fun setNoteItemClickListener() {
+        noteAdapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val note = notesList[position]
-                val bundle = Bundle()
-                val dateTime = DateTypeConverter().fromOffsetDateTime(note.dateModified)
-                bundle.putString("title", note.title)
-                bundle.putString("notes", note.content)
-                bundle.putString("key", note.key)
-                bundle.putLong("id", note.id)
-                bundle.putString("dateModified", dateTime)
-                bundle.putBoolean("archived", note.archived)
-                bundle.putString("reminder", DateTypeConverter().fromOffsetDateTime(note.reminder))
-                val notePage = NoteFragment()
-                notePage.arguments = bundle
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_view, notePage).commit()
+                sharedViewModel.setGoToExistingNotePage(note)
             }
         })
     }
 
-    private fun myRecyclerView() {
-        myAdapter = MyAdapter(notesList)
+    private fun initRecyclerView() {
+        noteAdapter = NoteAdapter(notesList)
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
         recyclerView.setHasFixedSize(true)
@@ -190,19 +175,18 @@ class HomeFragment
                     val firstItemPositionArray = layoutManager.findFirstVisibleItemPositions(null)
                     val firstItemPosition = firstItemPositionArray[0]
 
-                    Log.i("recyclerScroll", "$totalNotes")
                     if (((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
-                        notesLoader()
+                        binding.recyclerProgressBar.isVisible = isLoading
                         when (type) {
                             ARCHIVE -> {
-                                homeViewModel.getArchivePaged(requireContext(), 10, totalItem)
+                                homeViewModel.getArchivePaged(requireContext(), NOTES_LIMIT, totalItem)
                             }
                             REMINDER -> {
-                                homeViewModel.getReminderPaged(requireContext(), 10, totalItem)
+                                homeViewModel.getReminderPaged(requireContext(), NOTES_LIMIT, totalItem)
                             }
                             else -> {
-                                homeViewModel.getPagedNotes(requireContext(), 10, totalItem)
+                                homeViewModel.getPagedNotes(requireContext(), NOTES_LIMIT, totalItem)
                             }
                         }
                     }
@@ -212,19 +196,18 @@ class HomeFragment
                     val totalItem = layoutManager.itemCount
                     val firstItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                    Log.i("recyclerScroll", "$totalNotes")
                     if (((visibleItemCount + firstItemPosition) >= totalItem) && (totalItem < totalNotes)) {
                         isLoading = true
-                        notesLoader()
+                        binding.recyclerProgressBar.isVisible = isLoading
                         when (type) {
                             ARCHIVE -> {
-                                homeViewModel.getArchivePaged(requireContext(), 10, totalItem)
+                                homeViewModel.getArchivePaged(requireContext(), NOTES_LIMIT, totalItem)
                             }
                             REMINDER -> {
-                                homeViewModel.getReminderPaged(requireContext(), 10, totalItem)
+                                homeViewModel.getReminderPaged(requireContext(), NOTES_LIMIT, totalItem)
                             }
                             else -> {
-                                homeViewModel.getPagedNotes(requireContext(), 10, totalItem)
+                                homeViewModel.getPagedNotes(requireContext(), NOTES_LIMIT, totalItem)
                             }
                         }
                     }
@@ -232,7 +215,7 @@ class HomeFragment
             }
         })
 
-        recyclerView.adapter = myAdapter
+        recyclerView.adapter = noteAdapter
 
         when (type) {
             ARCHIVE -> {
@@ -246,24 +229,24 @@ class HomeFragment
             }
         }
 
-        notesObserver()
-        archivedObserver()
-        reminderObserver()
+        observerNotes()
+        observerArchiveNotes()
+        observerReminderNotes()
     }
 
-    private fun notesObserver() {
+    private fun observerNotes() {
         homeViewModel.getNewNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getNotesCount(requireContext())
-            myAdapter.notifyDataSetChanged()
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
         }
 
         homeViewModel.getPagedNotesStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
-            notesLoader()
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            binding.recyclerProgressBar.isVisible = isLoading
         }
 
         homeViewModel.getNoteCount.observe(viewLifecycleOwner) {
@@ -271,12 +254,12 @@ class HomeFragment
         }
     }
 
-    private fun archivedObserver() {
+    private fun observerArchiveNotes() {
         homeViewModel.getArchiveNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getArchiveCount(requireContext())
-            myAdapter.notifyDataSetChanged()
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
         }
 
         homeViewModel.getArchiveCount.observe(viewLifecycleOwner) {
@@ -286,17 +269,17 @@ class HomeFragment
         homeViewModel.getArchivePagedStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
-            notesLoader()
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            binding.recyclerProgressBar.isVisible = isLoading
         }
     }
 
-    private fun reminderObserver() {
+    private fun observerReminderNotes() {
         homeViewModel.getReminderNotesStatus.observe(viewLifecycleOwner) {
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getReminderCount(requireContext())
-            myAdapter.notifyDataSetChanged()
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
         }
 
         homeViewModel.getReminderCount.observe(viewLifecycleOwner) {
@@ -306,16 +289,8 @@ class HomeFragment
         homeViewModel.getReminderPagedStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            myAdapter.notifyDataSetChanged()
-            notesLoader()
-        }
-    }
-
-    private fun notesLoader() {
-        if (isLoading) {
-            binding.recyclerProgressBar.visibility = View.VISIBLE
-        } else {
-            binding.recyclerProgressBar.visibility = View.GONE
+            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            binding.recyclerProgressBar.isVisible = isLoading
         }
     }
 
@@ -390,7 +365,7 @@ class HomeFragment
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                myAdapter.filter.filter(newText)
+                noteAdapter.filter.filter(newText)
                 return false
             }
 
@@ -422,7 +397,6 @@ class HomeFragment
         close.setOnClickListener {
             dismissDialog()
         }
-
 
         val profileIcon: ImageButton = dialogView.findViewById(R.id.dialog_profile_icon)
         profileIcon.setOnClickListener {

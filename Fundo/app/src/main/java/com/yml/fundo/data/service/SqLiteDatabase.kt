@@ -10,7 +10,7 @@ import com.yml.fundo.data.room.database.LocalDatabase
 import com.yml.fundo.data.room.entity.NotesEntity
 import com.yml.fundo.data.room.entity.OperationEntity
 import com.yml.fundo.data.room.entity.UserEntity
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -49,32 +49,32 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun addNewNoteToDB(notes: Notes, onlineStatus: Boolean = true): Notes {
+    suspend fun addNewNoteToDB(note: Note, onlineStatus: Boolean = true): Note {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
-                fNid = notes.key,
-                title = notes.title,
-                content = notes.content,
-                dateModified = notes.dateModified,
-                nid = notes.id,
-                archived = notes.archived,
-                reminder = notes.reminder
+                fNid = note.key,
+                title = note.title,
+                content = note.content,
+                dateModified = note.dateModified,
+                nid = note.id,
+                archived = note.archived,
+                reminder = note.reminder
             )
-            notes.id = notesDao.addNewNoteToDB(noteEntity)
+            note.id = notesDao.addNewNoteToDB(noteEntity)
             if (!onlineStatus) {
-                val opEntity = OperationEntity(notes.key, CREATE_OP_CODE)
+                val opEntity = OperationEntity(note.key, CREATE_OP_CODE)
                 operationDao.addOp(opEntity)
             }
-            notes
+            note
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<Notes> {
+    suspend fun getNewNoteFromDB(): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getNewNoteFromDB()
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder
@@ -85,12 +85,12 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Notes> {
+    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getPagedNote(limit, offset)
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder
@@ -101,12 +101,12 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Notes> {
+    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getArchivePaged(limit, offset)
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder
@@ -117,12 +117,12 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Notes> {
+    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getReminderPaged(limit, offset)
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder
@@ -151,33 +151,33 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun updateNewNoteInDB(notes: Notes, onlineStatus: Boolean = true): Boolean {
+    suspend fun updateNewNoteInDB(note: Note, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
-                fNid = notes.key, title = notes.title, content = notes.content,
-                dateModified = notes.dateModified, nid = notes.id, archived = notes.archived,
-                reminder = notes.reminder
+                fNid = note.key, title = note.title, content = note.content,
+                dateModified = note.dateModified, nid = note.id, archived = note.archived,
+                reminder = note.reminder
             )
             notesDao.updateNewNoteInDB(noteEntity)
             if (!onlineStatus) {
-                val opEntity = OperationEntity(notes.key, UPDATE_OP_CODE)
+                val opEntity = OperationEntity(note.key, UPDATE_OP_CODE)
                 operationDao.addOp(opEntity)
             }
             true
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: Notes, onlineStatus: Boolean = true): Boolean {
+    suspend fun deleteNoteFromDB(note: Note, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
-                fNid = notes.key, title = notes.title, content = notes.content,
-                dateModified = notes.dateModified, nid = notes.id,
-                archived = notes.archived, reminder = notes.reminder
+                fNid = note.key, title = note.title, content = note.content,
+                dateModified = note.dateModified, nid = note.id,
+                archived = note.archived, reminder = note.reminder
             )
             notesDao.deleteNoteFromDB(noteEntity)
             if (!onlineStatus) {
-                if (notes.key.isNotEmpty()) {
-                    val opEntity = OperationEntity(notes.key, DELETE_OP_CODE)
+                if (note.key.isNotEmpty()) {
+                    val opEntity = OperationEntity(note.key, DELETE_OP_CODE)
                     operationDao.addOp(opEntity)
                 }
             }
@@ -185,7 +185,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getOpCode(note: Notes): Int {
+    suspend fun getOpCode(note: Note): Int {
         Log.i("Opcode", "in op code")
         return withContext(Dispatchers.IO) {
             val opc = operationDao.getOpCode(note.key)
@@ -206,13 +206,13 @@ class SqLiteDatabase(context: Context) {
         localDatabase.clearAllTables()
     }
 
-    suspend fun getArchiveNoteFromDB(): ArrayList<Notes> {
+    suspend fun getArchiveNoteFromDB(): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getArchivedNoteFromDB()
             Log.i("SQLService","$notesEntity")
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder
@@ -228,12 +228,12 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getReminderNoteFromDB(): ArrayList<Notes> {
+    suspend fun getReminderNoteFromDB(): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getReminderNotes()
-            val notesList = arrayListOf<Notes>()
+            val notesList = arrayListOf<Note>()
             for (i in notesEntity) {
-                val notesKey = Notes(
+                val notesKey = Note(
                     title = i.title, content = i.content,
                     key = i.fNid, dateModified = i.dateModified, id = i.nid,
                     archived = i.archived, reminder = i.reminder

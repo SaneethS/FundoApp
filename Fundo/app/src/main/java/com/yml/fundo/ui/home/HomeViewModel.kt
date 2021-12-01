@@ -11,7 +11,7 @@ import com.yml.fundo.auth.Authentication
 import com.yml.fundo.data.service.DatabaseService
 import com.yml.fundo.data.service.Storage
 import com.yml.fundo.data.service.SyncDatabase
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -20,11 +20,11 @@ class HomeViewModel : ViewModel() {
     private val _userAvatarStatus = MutableLiveData<Bitmap>()
     val userAvatarStatus = _userAvatarStatus as LiveData<Bitmap>
 
-    private val _getNewNotesStatus = MutableLiveData<ArrayList<Notes>>()
-    val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Notes>>
+    private val _getNewNotesStatus = MutableLiveData<ArrayList<Note>>()
+    val getNewNotesStatus = _getNewNotesStatus as LiveData<ArrayList<Note>>
 
-    private val _getPagedNotesStatus = MutableLiveData<ArrayList<Notes>>()
-    val getPagedNotesStatus = _getPagedNotesStatus as LiveData<ArrayList<Notes>>
+    private val _getPagedNotesStatus = MutableLiveData<ArrayList<Note>>()
+    val getPagedNotesStatus = _getPagedNotesStatus as LiveData<ArrayList<Note>>
 
     private val _getNoteCount = MutableLiveData<Int>()
     val getNoteCount = _getNoteCount as LiveData<Int>
@@ -35,17 +35,17 @@ class HomeViewModel : ViewModel() {
     private val _getReminderCount = MutableLiveData<Int>()
     val getReminderCount = _getReminderCount as LiveData<Int>
 
-    private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Notes>>()
-    val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Notes>>
+    private val _getArchiveNotesStatus = MutableLiveData<ArrayList<Note>>()
+    val getArchiveNotesStatus = _getArchiveNotesStatus as LiveData<ArrayList<Note>>
 
-    private val _getArchivePagedStatus = MutableLiveData<ArrayList<Notes>>()
-    val getArchivePagedStatus = _getArchivePagedStatus as LiveData<ArrayList<Notes>>
+    private val _getArchivePagedStatus = MutableLiveData<ArrayList<Note>>()
+    val getArchivePagedStatus = _getArchivePagedStatus as LiveData<ArrayList<Note>>
 
-    private val _getReminderNotesStatus = MutableLiveData<ArrayList<Notes>>()
-    val getReminderNotesStatus = _getReminderNotesStatus as LiveData<ArrayList<Notes>>
+    private val _getReminderNotesStatus = MutableLiveData<ArrayList<Note>>()
+    val getReminderNotesStatus = _getReminderNotesStatus as LiveData<ArrayList<Note>>
 
-    private val _getReminderPagedStatus = MutableLiveData<ArrayList<Notes>>()
-    val getReminderPagedStatus = _getReminderPagedStatus as LiveData<ArrayList<Notes>>
+    private val _getReminderPagedStatus = MutableLiveData<ArrayList<Note>>()
+    val getReminderPagedStatus = _getReminderPagedStatus as LiveData<ArrayList<Note>>
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>

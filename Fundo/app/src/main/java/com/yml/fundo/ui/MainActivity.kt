@@ -1,5 +1,6 @@
 package com.yml.fundo.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import com.yml.fundo.ui.note.NoteFragment
 import com.yml.fundo.ui.register.RegisterFragment
 import com.yml.fundo.ui.reset.ResetPasswordFragment
 import com.yml.fundo.ui.splash.SplashScreenFragment
+import com.yml.fundo.ui.wrapper.Note
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -34,6 +36,24 @@ class MainActivity : AppCompatActivity() {
             goToSplashScreen()
         }
         navigationDrawer()
+        setNotificationNavigationPage()
+        sharedViewModel.setTopicToSubscribe()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setNotificationNavigationPage()
+    }
+
+    private fun setNotificationNavigationPage() {
+        when(intent?.getStringExtra("destination")){
+            "home" -> {
+                if(sharedViewModel.checkUser()) {
+                    val notes = intent.getSerializableExtra("notes") as Note
+                    goToExistingNotePage(notes)
+                }
+            }
+        }
     }
 
     private fun observeNavigation() {
@@ -85,6 +105,10 @@ class MainActivity : AppCompatActivity() {
                 goToReminderNotePage()
             }
         }
+
+        sharedViewModel.goToExistNotePageStatus.observe(this@MainActivity) {
+            goToExistingNotePage(it)
+        }
     }
 
     private fun goToReminderNotePage() {
@@ -129,6 +153,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun goToNotePage() {
         switchFragment(NoteFragment())
+    }
+
+    private fun goToExistingNotePage(note: Note) {
+        val notePage = NoteFragment()
+        val bundle = Util.setToNotesBundle(note)
+        notePage.arguments = bundle
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_view, notePage).commit()
     }
 
     private fun goToLabelCreate() {

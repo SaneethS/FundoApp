@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.yml.fundo.common.NetworkService
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,15 +25,15 @@ class SyncDatabase(val context: Context) {
         }
     }
 
-    private suspend fun getLatestNotesFromDB(user: User): List<Notes> {
+    private suspend fun getLatestNotesFromDB(user: User): List<Note> {
         return withContext(Dispatchers.IO) {
             val sqlLiteNoteList = DatabaseService.getInstance(context).getNewNoteFromDB()
-            val localNotesList = mutableListOf<Notes>()
+            val localNotesList = mutableListOf<Note>()
             if (sqlLiteNoteList != null) {
                 localNotesList.addAll(sqlLiteNoteList)
             }
             val firebaseNotesList = DatabaseService.getInstance(context).getNewNoteFromCloud(user)
-            val latestNotes = mutableListOf<Notes>()
+            val latestNotes = mutableListOf<Note>()
 
             if (firebaseNotesList != null) {
                 for (noteF in firebaseNotesList) {
@@ -88,18 +88,18 @@ class SyncDatabase(val context: Context) {
                 }
                 return@withContext latestNotes
             } else {
-                return@withContext listOf<Notes>()
+                return@withContext listOf<Note>()
             }
         }
     }
 
-    private suspend fun getOpCode(noteL: Notes): Int {
+    private suspend fun getOpCode(noteL: Note): Int {
         return withContext(Dispatchers.IO) {
             return@withContext DatabaseService.getInstance(context).getOpCode(noteL)
         }
     }
 
-    private fun compareTimeStamp(noteL: Notes, noteF: Notes): Boolean {
+    private fun compareTimeStamp(noteL: Note, noteF: Note): Boolean {
         val localTime = noteL.dateModified
         val cloudTime = noteF.dateModified
         return if (localTime != null && cloudTime != null) {

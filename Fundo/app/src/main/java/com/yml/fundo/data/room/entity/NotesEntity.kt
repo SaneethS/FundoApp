@@ -2,7 +2,7 @@ package com.yml.fundo.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import java.util.*
 
 @Entity(tableName = "notes")
@@ -15,7 +15,7 @@ data class NotesEntity(
     var archived: Boolean,
     var reminder: Date? = null
 ) {
-    fun toNotes(): Notes {
-        return Notes(title, content, dateModified, fNid, nid, archived, reminder)
+    fun toNotes(): Note {
+        return Note(title, content, dateModified, fNid, nid, archived, reminder)
     }
 }

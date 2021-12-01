@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yml.fundo.data.service.DatabaseService
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.launch
 import java.util.*
@@ -24,33 +24,33 @@ class NoteViewModel : ViewModel() {
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
 
-    fun addNewNote(context: Context, notes: Notes, user: User) {
+    fun addNewNote(context: Context, note: Note, user: User) {
         viewModelScope.launch {
             val cal = Calendar.getInstance()
-            notes.dateModified = cal.time
-            val result = DatabaseService.getInstance(context).addNewNoteToDB(notes, user)
+            note.dateModified = cal.time
+            val result = DatabaseService.getInstance(context).addNewNoteToDB(note, user)
             if (result) {
                 _addNewNoteStatus.value = result
             }
         }
     }
 
-    fun updateNotes(context: Context, notes: Notes, user: User) {
+    fun updateNotes(context: Context, note: Note, user: User) {
         viewModelScope.launch {
             val cal = Calendar.getInstance()
-            notes.dateModified = cal.time
-            val status = DatabaseService.getInstance(context).updateNewNoteInDB(notes, user)
+            note.dateModified = cal.time
+            val status = DatabaseService.getInstance(context).updateNewNoteInDB(note, user)
             if (status) {
                 _updateNoteStatus.value = status
             }
         }
     }
 
-    fun deleteNotes(context: Context, notes: Notes, user: User) {
+    fun deleteNotes(context: Context, note: Note, user: User) {
         viewModelScope.launch {
             val cal = Calendar.getInstance()
-            notes.dateModified = cal.time
-            val status = DatabaseService.getInstance(context).deleteNoteFromDB(notes, user)
+            note.dateModified = cal.time
+            val status = DatabaseService.getInstance(context).deleteNoteFromDB(note, user)
             if (status) {
                 _deleteNoteStatus.value = status
             }

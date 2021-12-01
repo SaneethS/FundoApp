@@ -5,7 +5,7 @@ import android.util.Log
 import com.yml.fundo.common.NetworkService
 import com.yml.fundo.ui.wrapper.Label
 import com.yml.fundo.ui.wrapper.User
-import com.yml.fundo.ui.wrapper.Notes
+import com.yml.fundo.ui.wrapper.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -69,10 +69,10 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun addNoteToLocalDb(notes: Notes): Boolean {
+    suspend fun addNoteToLocalDb(note: Note): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                sqlDb.addNewNoteToDB(notes, false)
+                sqlDb.addNewNoteToDB(note, false)
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -81,14 +81,14 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun addNewNoteToDB(notes: Notes, user: User): Boolean {
+    suspend fun addNewNoteToDB(note: Note, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)) {
-                    val note = firebaseDatabase.addNewNoteToDB(notes, user)
+                    val note = firebaseDatabase.addNewNoteToDB(note, user)
                     sqlDb.addNewNoteToDB(note, true)
                 } else {
-                    sqlDb.addNewNoteToDB(notes, false)
+                    sqlDb.addNewNoteToDB(note, false)
                 }
                 true
             } catch (e: Exception) {
@@ -98,7 +98,7 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<Notes>? {
+    suspend fun getNewNoteFromDB(): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getNewNoteFromDB()
@@ -110,7 +110,7 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Notes>? {
+    suspend fun getPagedNote(limit: Int, offset: Int): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getPagedNote(limit, offset)
@@ -121,7 +121,7 @@ class DatabaseService(val context: Context) {
             }
         }
     }
-    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Notes>? {
+    suspend fun getArchivePaged(limit: Int, offset: Int): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getArchivePaged(limit, offset)
@@ -132,7 +132,7 @@ class DatabaseService(val context: Context) {
             }
         }
     }
-    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Notes>? {
+    suspend fun getReminderPaged(limit: Int, offset: Int): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getReminderPaged(limit, offset)
@@ -177,7 +177,7 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getArchiveNotesFromDB(): ArrayList<Notes>? {
+    suspend fun getArchiveNotesFromDB(): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getArchiveNoteFromDB()
@@ -189,7 +189,7 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getNewNoteFromCloud(user: User): ArrayList<Notes>? {
+    suspend fun getNewNoteFromCloud(user: User): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = firebaseDatabase.getNewNoteFromDB(user)
@@ -201,7 +201,7 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getReminderNotesFromDB(): ArrayList<Notes>? {
+    suspend fun getReminderNotesFromDB(): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
                 val notesList = sqlDb.getReminderNoteFromDB()
@@ -214,14 +214,14 @@ class DatabaseService(val context: Context) {
     }
 
 
-    suspend fun updateNewNoteInDB(notes: Notes, user: User): Boolean {
+    suspend fun updateNewNoteInDB(note: Note, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)) {
-                    sqlDb.updateNewNoteInDB(notes, true)
-                    firebaseDatabase.updateNewNoteInDB(notes, user)
+                    sqlDb.updateNewNoteInDB(note, true)
+                    firebaseDatabase.updateNewNoteInDB(note, user)
                 } else {
-                    sqlDb.updateNewNoteInDB(notes, false)
+                    sqlDb.updateNewNoteInDB(note, false)
                 }
                 true
             } catch (e: Exception) {
@@ -231,14 +231,14 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun deleteNoteFromDB(notes: Notes, user: User): Boolean {
+    suspend fun deleteNoteFromDB(note: Note, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)) {
-                    sqlDb.deleteNoteFromDB(notes, true)
-                    firebaseDatabase.deleteNoteFromDB(notes, user)
+                    sqlDb.deleteNoteFromDB(note, true)
+                    firebaseDatabase.deleteNoteFromDB(note, user)
                 } else {
-                    sqlDb.deleteNoteFromDB(notes, false)
+                    sqlDb.deleteNoteFromDB(note, false)
                 }
                 true
             } catch (e: Exception) {
@@ -248,9 +248,9 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getOpCode(notes: Notes): Int {
+    suspend fun getOpCode(note: Note): Int {
         return withContext(Dispatchers.IO) {
-            return@withContext sqlDb.getOpCode(notes)
+            return@withContext sqlDb.getOpCode(note)
         }
     }
 
