@@ -32,7 +32,7 @@ class SyncDatabase(val context: Context) {
             if (sqlLiteNoteList != null) {
                 localNotesList.addAll(sqlLiteNoteList)
             }
-            val firebaseNotesList = DatabaseService.getInstance(context).getNewNoteFromCloud(user)
+            val firebaseNotesList = DatabaseService.getInstance(context).getNotesFromCloud(user)
             val latestNotes = mutableListOf<Note>()
 
             if (firebaseNotesList != null) {
@@ -44,7 +44,7 @@ class SyncDatabase(val context: Context) {
                             Log.i("SyncDb", res.toString())
                             if (res) {
                                 latestNotes.add(noteL)
-                                firebaseDatabase.updateNewNoteInDB(
+                                firebaseDatabase.updateNotesInDB(
                                     noteL,
                                     user
                                 )

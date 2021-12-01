@@ -80,7 +80,6 @@ class HomeFragment
         setUserDetails()
         notesCount()
 
-
         binding.homeFab.setOnClickListener {
             sharedViewModel.setGoToNotePageStatus(true)
         }
@@ -214,7 +213,6 @@ class HomeFragment
                 }
             }
         })
-
         recyclerView.adapter = noteAdapter
 
         when (type) {
@@ -239,13 +237,13 @@ class HomeFragment
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getNotesCount(requireContext())
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getPagedNotesStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
             binding.recyclerProgressBar.isVisible = isLoading
         }
 
@@ -259,7 +257,7 @@ class HomeFragment
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getArchiveCount(requireContext())
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getArchiveCount.observe(viewLifecycleOwner) {
@@ -269,7 +267,7 @@ class HomeFragment
         homeViewModel.getArchivePagedStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
             binding.recyclerProgressBar.isVisible = isLoading
         }
     }
@@ -279,7 +277,7 @@ class HomeFragment
             notesList.clear()
             notesList.addAll(it)
             homeViewModel.getReminderCount(requireContext())
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
         }
 
         homeViewModel.getReminderCount.observe(viewLifecycleOwner) {
@@ -289,7 +287,7 @@ class HomeFragment
         homeViewModel.getReminderPagedStatus.observe(viewLifecycleOwner) {
             isLoading = false
             notesList.addAll(it)
-            noteAdapter.notifyItemRangeInserted(noteAdapter.itemCount, notesList.size)
+            noteAdapter.notifyDataSetChanged()
             binding.recyclerProgressBar.isVisible = isLoading
         }
     }
@@ -351,7 +349,6 @@ class HomeFragment
             } else {
                 recyclerView.layoutManager = StaggeredGridLayoutManager(2, 1)
             }
-
         }
     }
 

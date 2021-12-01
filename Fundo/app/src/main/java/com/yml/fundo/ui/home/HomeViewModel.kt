@@ -161,7 +161,7 @@ class HomeViewModel : ViewModel() {
 
     fun getUserInfo(context: Context, uid: Long) {
         viewModelScope.launch {
-            val userData = DatabaseService.getInstance(context).getFromDatabase(uid)
+            val userData = DatabaseService.getInstance(context).getUserFromDatabase(uid)
             if (userData != null) {
                 _userDataStatus.postValue(userData)
             }

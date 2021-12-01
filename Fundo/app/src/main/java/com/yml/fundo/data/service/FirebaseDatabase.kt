@@ -24,7 +24,7 @@ class FirebaseDatabase {
         fun getInstance(): FirebaseDatabase = instance ?: FirebaseDatabase()
     }
 
-    suspend fun setToDatabase(user: User): User? {
+    suspend fun setUserToDatabase(user: User): User? {
         val userDetails = FirebaseUserDetails(user.name, user.email, user.mobileNo)
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid)
@@ -40,7 +40,7 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun getFromDatabase(fUid: String): User {
+    suspend fun getUserFromDatabase(fUid: String): User {
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(fUid)
                 .get().addOnCompleteListener { status ->
@@ -80,7 +80,7 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun getNewNoteFromDB(user: User): ArrayList<Note>? {
+    suspend fun getNotesFromDB(user: User): ArrayList<Note>? {
         return suspendCoroutine { callback ->
             fireStore.collection("users").document(user.fUid).collection("notes")
                 .get().addOnCompleteListener {
@@ -113,7 +113,7 @@ class FirebaseDatabase {
         }
     }
 
-    suspend fun updateNewNoteInDB(note: Note, user: User): Boolean {
+    suspend fun updateNotesInDB(note: Note, user: User): Boolean {
         val notesMap = mapOf(
             "title" to note.title,
             "content" to note.content,
