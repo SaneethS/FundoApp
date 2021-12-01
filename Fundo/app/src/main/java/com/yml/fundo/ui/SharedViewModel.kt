@@ -78,7 +78,7 @@ class SharedViewModel : ViewModel() {
         return Authentication.getCurrentUser() != null
     }
 
-    fun setTopic() {
-        FirebaseTopicMessaging.setTopic()
+    fun setTopicToSubscribe() {
+        FirebaseTopicMessaging.setTopicToSubscribe()
     }
 }

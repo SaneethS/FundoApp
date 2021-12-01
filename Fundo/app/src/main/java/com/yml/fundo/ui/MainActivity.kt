@@ -36,21 +36,16 @@ class MainActivity : AppCompatActivity() {
             goToSplashScreen()
         }
         navigationDrawer()
-
-        when(intent.getStringExtra("destination")){
-            "home" -> {
-                if(sharedViewModel.checkUser()) {
-                    val notes = intent.getSerializableExtra("notes") as Note
-                    goToExistingNotePage(notes)
-                }
-            }
-        }
-
-        sharedViewModel.setTopic()
+        setNotificationNavigationPage()
+        sharedViewModel.setTopicToSubscribe()
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        setNotificationNavigationPage()
+    }
+
+    private fun setNotificationNavigationPage() {
         when(intent?.getStringExtra("destination")){
             "home" -> {
                 if(sharedViewModel.checkUser()) {

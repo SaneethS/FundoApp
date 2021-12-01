@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/back_button"
-        android:layout_width="50dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="30dp"
         android:src="@drawable/back_black">
@@ -64,9 +64,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/note_title_text"
-                    android:textSize="30sp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"
+                    android:textSize="32sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="20dp">
                 </com.google.android.material.textfield.TextInputEditText>
             </com.google.android.material.textfield.TextInputLayout>
@@ -82,9 +82,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/note_content_text"
-                    android:textSize="25sp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"
+                    android:textSize="24sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
                     android:layout_marginTop="20dp"
                     >
                 </com.google.android.material.textfield.TextInputEditText>
@@ -121,7 +121,6 @@
                     android:text="Tomorrow, 8:00 am"
                     android:textColor="@color/white"/>
             </RelativeLayout>
-
         </RelativeLayout>
     </ScrollView>
 
@@ -138,7 +137,6 @@
         android:backgroundTint="@color/Goldenrod"
         android:text="save"
         android:textAlignment="center">
-
     </com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton>
 
 
