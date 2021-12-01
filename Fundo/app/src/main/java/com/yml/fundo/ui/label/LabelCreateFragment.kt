@@ -97,7 +97,7 @@ class LabelCreateFragment : Fragment(R.layout.label_creation) {
         labelCreateViewModel.getLabelStatus.observe(viewLifecycleOwner) {
             labelList.clear()
             labelList.addAll(it)
-            labelCreateAdapter.notifyDataSetChanged()
+            labelCreateAdapter.notifyItemRangeInserted(labelCreateAdapter.itemCount, labelList.size)
         }
 
         labelCreateViewModel.deleteLabelStatus.observe(viewLifecycleOwner) {

@@ -24,57 +24,62 @@ class LabelCreateAdapter(
             parent, false
         )
 
-        return LabelViewHolder(itemView)
+        return LabelViewHolder(context, itemView, labelCreateViewModel)
     }
 
     override fun onBindViewHolder(holder: LabelViewHolder, position: Int) {
         val item = labelList[position]
-        holder.label.setText(item.name)
-
-        holder.label.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                holder.deleteButton.setImageDrawable(context.getDrawable(R.drawable.delete_icon))
-                holder.editButton.setImageDrawable(context.getDrawable(R.drawable.tick_mark))
-                holder.deleteButton.tag = "delete"
-                holder.editButton.tag = "tick"
-            } else {
-                holder.deleteButton.setImageDrawable(context.getDrawable(R.drawable.label_outlined))
-                holder.editButton.setImageDrawable(context.getDrawable(R.drawable.edit_icon))
-                holder.deleteButton.tag = "label"
-                holder.editButton.tag = "pen"
-            }
-        }
-
-        holder.deleteButton.setOnClickListener {
-            if (holder.deleteButton.tag == "delete") {
-                labelCreateViewModel.deleteLabel(context, item)
-            } else {
-                holder.label.requestFocus()
-            }
-        }
-
-        holder.editButton.setOnClickListener {
-            if (holder.editButton.tag == "tick") {
-                if (holder.label.text.toString().isEmpty()) {
-                    labelCreateViewModel.deleteLabel(context, item)
-                } else if (holder.label.text.toString() != item.name) {
-                    item.name = holder.label.text.toString()
-                    labelCreateViewModel.updateLabel(context, item)
-                }
-                holder.label.clearFocus()
-            } else {
-                holder.label.requestFocus()
-            }
-        }
+        holder.bind(item)
     }
 
     override fun getItemCount(): Int {
         return labelList.size
     }
 
-    class LabelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val label: EditText = view.findViewById(R.id.list_label_name)
-        val deleteButton: ImageView = view.findViewById(R.id.delete_label_button)
-        val editButton: ImageView = view.findViewById(R.id.edit_label_button)
+    class LabelViewHolder(val context: Context, view: View,
+                          private val labelCreateViewModel: LabelCreateViewModel) : RecyclerView.ViewHolder(view) {
+        private val label: EditText = view.findViewById(R.id.list_label_name)
+        private val deleteButton: ImageView = view.findViewById(R.id.delete_label_button)
+        private val editButton: ImageView = view.findViewById(R.id.edit_label_button)
+
+        fun bind(item: Label) {
+            label.setText(item.name)
+
+            label.setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    deleteButton.setImageDrawable(context.getDrawable(R.drawable.delete_icon))
+                    editButton.setImageDrawable(context.getDrawable(R.drawable.tick_mark))
+                    deleteButton.tag = "delete"
+                    editButton.tag = "tick"
+                } else {
+                    deleteButton.setImageDrawable(context.getDrawable(R.drawable.label_outlined))
+                    editButton.setImageDrawable(context.getDrawable(R.drawable.edit_icon))
+                    deleteButton.tag = "label"
+                    editButton.tag = "pen"
+                }
+            }
+
+            deleteButton.setOnClickListener {
+                if (deleteButton.tag == "delete") {
+                    labelCreateViewModel.deleteLabel(context, item)
+                } else {
+                    label.requestFocus()
+                }
+            }
+
+            editButton.setOnClickListener {
+                if (editButton.tag == "tick") {
+                    if (label.text.toString().isEmpty()) {
+                        labelCreateViewModel.deleteLabel(context, item)
+                    } else if (label.text.toString() != item.name) {
+                        item.name = label.text.toString()
+                        labelCreateViewModel.updateLabel(context, item)
+                    }
+                    label.clearFocus()
+                } else {
+                    label.requestFocus()
+                }
+            }
+        }
     }
 }

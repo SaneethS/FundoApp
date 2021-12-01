@@ -1,7 +1,6 @@
 package com.yml.fundo.ui.login
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +10,6 @@ import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.auth.Authentication
 import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.service.DatabaseService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -26,7 +24,7 @@ class LoginViewModel : ViewModel() {
             viewModelScope.launch {
                 if (user?.loginStatus == true) {
                     if (user != null) {
-                        val userDet = DatabaseService.getInstance(context).setToDatabase(user)
+                        val userDet = DatabaseService.getInstance(context).setUserToDatabase(user)
                         if (userDet != null) {
                             SharedPref.addUid(userDet.uid)
                             DatabaseService.getInstance(context).addCloudDataToLocalDB(userDet)

@@ -13,7 +13,8 @@
         android:fontFamily="sans-serif"
         android:text="@string/login_text"
         android:textSize="45sp"
-        android:textStyle="bold"></TextView>
+        android:textStyle="bold">
+    </TextView>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"

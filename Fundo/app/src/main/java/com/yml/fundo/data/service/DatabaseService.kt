@@ -19,11 +19,11 @@ class DatabaseService(val context: Context) {
         fun getInstance(context: Context): DatabaseService = instance ?: DatabaseService(context)
     }
 
-    suspend fun setToDatabase(user: User): User? {
+    suspend fun setUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
-                val userFirebase = firebaseDatabase.getFromDatabase(user.fUid)
-                val userSql = sqlDb.setToDatabase(userFirebase)
+                val userFirebase = firebaseDatabase.getUserFromDatabase(user.fUid)
+                val userSql = sqlDb.setUserToDatabase(userFirebase)
                 userSql
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -35,8 +35,8 @@ class DatabaseService(val context: Context) {
     suspend fun setNewUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
-                val userFirebase = firebaseDatabase.setToDatabase(user)
-                val userSql = sqlDb.setToDatabase(userFirebase!!)
+                val userFirebase = firebaseDatabase.setUserToDatabase(user)
+                val userSql = sqlDb.setUserToDatabase(userFirebase!!)
                 userSql
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -45,10 +45,10 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getFromDatabase(uid: Long): User? {
+    suspend fun getUserFromDatabase(uid: Long): User? {
         return withContext(Dispatchers.IO) {
             try {
-                sqlDb.getFromDatabase(uid)
+                sqlDb.getUserFromDatabase(uid)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -59,7 +59,7 @@ class DatabaseService(val context: Context) {
 
     suspend fun addCloudDataToLocalDB(user: User): Boolean {
         return withContext(Dispatchers.IO) {
-            val noteListFromCloud = firebaseDatabase.getNewNoteFromDB(user)
+            val noteListFromCloud = firebaseDatabase.getNotesFromDB(user)
             if (noteListFromCloud != null) {
                 for (i in noteListFromCloud) {
                     sqlDb.addNewNoteToDB(i)
@@ -101,7 +101,7 @@ class DatabaseService(val context: Context) {
     suspend fun getNewNoteFromDB(): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
-                val notesList = sqlDb.getNewNoteFromDB()
+                val notesList = sqlDb.getNotesFromDB()
                 notesList
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -189,10 +189,10 @@ class DatabaseService(val context: Context) {
         }
     }
 
-    suspend fun getNewNoteFromCloud(user: User): ArrayList<Note>? {
+    suspend fun getNotesFromCloud(user: User): ArrayList<Note>? {
         return withContext(Dispatchers.IO) {
             try {
-                val notesList = firebaseDatabase.getNewNoteFromDB(user)
+                val notesList = firebaseDatabase.getNotesFromDB(user)
                 notesList
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -214,14 +214,14 @@ class DatabaseService(val context: Context) {
     }
 
 
-    suspend fun updateNewNoteInDB(note: Note, user: User): Boolean {
+    suspend fun updateNotesInDB(note: Note, user: User): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 if (NetworkService.isNetworkAvailable(context)) {
-                    sqlDb.updateNewNoteInDB(note, true)
-                    firebaseDatabase.updateNewNoteInDB(note, user)
+                    sqlDb.updateNotesInDB(note, true)
+                    firebaseDatabase.updateNotesInDB(note, user)
                 } else {
-                    sqlDb.updateNewNoteInDB(note, false)
+                    sqlDb.updateNotesInDB(note, false)
                 }
                 true
             } catch (e: Exception) {
@@ -258,7 +258,7 @@ class DatabaseService(val context: Context) {
         sqlDb.clearNoteAndOperation()
     }
 
-    suspend fun clearAllTables() {
+    fun clearAllTables() {
         sqlDb.clearAllTables()
     }
 

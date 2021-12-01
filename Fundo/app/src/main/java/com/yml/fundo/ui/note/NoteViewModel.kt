@@ -39,7 +39,7 @@ class NoteViewModel : ViewModel() {
         viewModelScope.launch {
             val cal = Calendar.getInstance()
             note.dateModified = cal.time
-            val status = DatabaseService.getInstance(context).updateNewNoteInDB(note, user)
+            val status = DatabaseService.getInstance(context).updateNotesInDB(note, user)
             if (status) {
                 _updateNoteStatus.value = status
             }
@@ -59,7 +59,7 @@ class NoteViewModel : ViewModel() {
 
     fun getUserInfo(context: Context, uid: Long) {
         viewModelScope.launch {
-            val userData = DatabaseService.getInstance(context).getFromDatabase(uid)
+            val userData = DatabaseService.getInstance(context).getUserFromDatabase(uid)
             if (userData != null) {
                 _userDataStatus.postValue(userData)
             }

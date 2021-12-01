@@ -24,7 +24,7 @@ class SqLiteDatabase(context: Context) {
     private val notesDao = localDatabase.notesDao()
     private val operationDao = localDatabase.operationDao()
 
-    suspend fun setToDatabase(user: User): User {
+    suspend fun setUserToDatabase(user: User): User {
         val fUid = Authentication.getCurrentUser()?.uid.toString()
         return withContext(Dispatchers.IO) {
             val userEntity = UserEntity(
@@ -35,7 +35,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getFromDatabase(uid: Long): User {
+    suspend fun getUserFromDatabase(uid: Long): User {
         return withContext(Dispatchers.IO) {
             val userInfo = userDao.getUserFromDB(uid)
             val user = User(
@@ -69,7 +69,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun getNewNoteFromDB(): ArrayList<Note> {
+    suspend fun getNotesFromDB(): ArrayList<Note> {
         return withContext(Dispatchers.IO) {
             val notesEntity = notesDao.getNewNoteFromDB()
             val notesList = arrayListOf<Note>()
@@ -151,7 +151,7 @@ class SqLiteDatabase(context: Context) {
         }
     }
 
-    suspend fun updateNewNoteInDB(note: Note, onlineStatus: Boolean = true): Boolean {
+    suspend fun updateNotesInDB(note: Note, onlineStatus: Boolean = true): Boolean {
         return withContext(Dispatchers.IO) {
             val noteEntity = NotesEntity(
                 fNid = note.key, title = note.title, content = note.content,

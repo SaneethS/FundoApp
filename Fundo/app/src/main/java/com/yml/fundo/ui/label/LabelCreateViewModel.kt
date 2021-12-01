@@ -1,7 +1,6 @@
 package com.yml.fundo.ui.label
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -43,7 +42,7 @@ class LabelCreateViewModel : ViewModel() {
 
     fun getUserInfo(context: Context, uid: Long) {
         viewModelScope.launch {
-            val userData = DatabaseService.getInstance(context).getFromDatabase(uid)
+            val userData = DatabaseService.getInstance(context).getUserFromDatabase(uid)
             if (userData != null) {
                 _userDataStatus.postValue(userData)
             }
@@ -53,7 +52,7 @@ class LabelCreateViewModel : ViewModel() {
     fun getLabel(context: Context) {
         viewModelScope.launch {
             val userId = SharedPref.getId()
-            val userDetails = DatabaseService.getInstance(context).getFromDatabase(userId)
+            val userDetails = DatabaseService.getInstance(context).getUserFromDatabase(userId)
             val label = DatabaseService.getInstance(context).getLabel(userDetails)
             if (label != null) {
                 _getLabelStatus.value = label
@@ -66,7 +65,7 @@ class LabelCreateViewModel : ViewModel() {
             val cal = Calendar.getInstance()
             label.dateModified = cal.time
             val userId = SharedPref.getId()
-            val userDetails = DatabaseService.getInstance(context).getFromDatabase(userId)
+            val userDetails = DatabaseService.getInstance(context).getUserFromDatabase(userId)
             val label = DatabaseService.getInstance(context).deleteLabel(label, userDetails)
             if (label != null) {
                 _deleteLabelStatus.value = label
@@ -79,7 +78,7 @@ class LabelCreateViewModel : ViewModel() {
             val cal = Calendar.getInstance()
             label.dateModified = cal.time
             val userId = SharedPref.getId()
-            val userDetails = DatabaseService.getInstance(context).getFromDatabase(userId)
+            val userDetails = DatabaseService.getInstance(context).getUserFromDatabase(userId)
             val label =
                 userDetails?.let { DatabaseService.getInstance(context).updateLabel(label, it) }
             if (label != null) {
