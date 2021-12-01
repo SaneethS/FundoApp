@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Fundo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.Fundo" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/Goldenrod</item>
         <item name="colorPrimaryVariant">@color/DarkGoldenrod</item>
@@ -14,6 +16,8 @@
         <!-- Customize your theme here. -->
     </style>
     <style name="Theme.SplashScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/Goldenrod</item>
         <item name="colorPrimaryVariant">@color/DarkGoldenrod</item>
