@@ -248,6 +248,43 @@ class DatabaseService(val context: Context) {
         }
     }
 
+    suspend fun labelNoteAssociation(noteId: String, lables: ArrayList<Label>, user: User): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                lables.forEach {
+                    firebaseDatabase.labelNoteAssociation(noteId, it.fid, user)
+                }
+                true
+            }catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+    suspend fun removeLabelNoteLink(linkId: String, user: User): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                firebaseDatabase.removeLabelNoteLink(linkId, user)
+                true
+            }catch (e:Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+    suspend fun getLabelForNote(noteId: String, user: User): ArrayList<Label>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                firebaseDatabase.getLabelForNote(noteId, user)
+            }catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
     suspend fun getOpCode(note: Note): Int {
         return withContext(Dispatchers.IO) {
             return@withContext sqlDb.getOpCode(note)

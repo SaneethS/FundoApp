@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yml.fundo.common.SharedPref
 import com.yml.fundo.data.service.DatabaseService
+import com.yml.fundo.ui.wrapper.Label
 import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import kotlinx.coroutines.launch
@@ -23,6 +25,9 @@ class NoteViewModel : ViewModel() {
 
     private val _userDataStatus = MutableLiveData<User>()
     val userDataStatus = _userDataStatus as LiveData<User>
+
+    private val _getLabelForNotesStatus = MutableLiveData<ArrayList<Label>>()
+    val getLabelForNotesStatus = _getLabelForNotesStatus as LiveData<ArrayList<Label>>
 
     fun addNewNote(context: Context, note: Note, user: User) {
         viewModelScope.launch {
@@ -63,6 +68,16 @@ class NoteViewModel : ViewModel() {
             if (userData != null) {
                 _userDataStatus.postValue(userData)
             }
+        }
+    }
+
+    fun getNoteFromLabel(context: Context, note: Note) {
+        viewModelScope.launch {
+            val userId = SharedPref.getId()
+            val user = DatabaseService.getInstance(context).getUserFromDatabase(userId)
+            val labelNoteList =
+                user?.let { DatabaseService.getInstance(context).getLabelForNote(note.key, it) }
+            _getLabelForNotesStatus.value = labelNoteList
         }
     }
 }

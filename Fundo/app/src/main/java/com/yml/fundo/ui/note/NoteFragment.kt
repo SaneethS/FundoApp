@@ -21,6 +21,8 @@ import com.yml.fundo.common.*
 import com.yml.fundo.data.room.DateTypeConverter
 import com.yml.fundo.databinding.NotePageBinding
 import com.yml.fundo.ui.SharedViewModel
+import com.yml.fundo.ui.label.LabelCreateFragment
+import com.yml.fundo.ui.wrapper.Label
 import com.yml.fundo.ui.wrapper.Note
 import com.yml.fundo.ui.wrapper.User
 import java.text.SimpleDateFormat
@@ -31,6 +33,7 @@ class NoteFragment : Fragment(R.layout.note_page) {
     private lateinit var binding: NotePageBinding
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var noteViewModel: NoteViewModel
+    private lateinit var dialog: Dialog
     private var reminder: Date? = null
     private var noteTitle: String? = null
     private var noteContent: String? = null
@@ -40,12 +43,17 @@ class NoteFragment : Fragment(R.layout.note_page) {
     private var bundleArchived: Boolean? = null
     private var bundleReminder: Date? = null
     private var userId: Long = 0L
+    private var note: Note? = null
     private var currentUser: User =
         User(name = "Name", email = "EmailID", mobileNo = "MobileNumber")
+    private var labelNoteList: ArrayList<Label> = ArrayList()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.loading_screen)
+        dialog.show()
         binding = NotePageBinding.bind(view)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         noteViewModel = ViewModelProvider(this)[NoteViewModel::class.java]
@@ -54,9 +62,9 @@ class NoteFragment : Fragment(R.layout.note_page) {
         noteViewModel.getUserInfo(requireContext(), userId)
 
         binding.backButton.setOnClickListener {
-            if(bundleArchived == true) {
+            if (bundleArchived == true) {
                 sharedViewModel.setGoToArchivedNotePageStatus(true)
-            }else{
+            } else {
                 sharedViewModel.setGoToHomePageStatus(true)
             }
         }
@@ -91,12 +99,13 @@ class NoteFragment : Fragment(R.layout.note_page) {
 
         noteContents()
         checkVisibility()
+        initLabels()
 
         noteViewModel.updateNoteStatus.observe(viewLifecycleOwner) {
             if (it) {
-                if(bundleArchived == true) {
+                if (bundleArchived == true) {
                     sharedViewModel.setGoToArchivedNotePageStatus(true)
-                }else {
+                } else {
                     sharedViewModel.setGoToHomePageStatus(true)
                 }
             } else {
@@ -124,17 +133,55 @@ class NoteFragment : Fragment(R.layout.note_page) {
             currentUser = it
         }
 
+        noteViewModel.getLabelForNotesStatus.observe(viewLifecycleOwner) {
+            labelNoteList.clear()
+            labelNoteList.addAll(it)
+            dialog.dismiss()
+        }
+
         archiveNotes()
         reminderNotes()
         createNotificationChannel()
+        goToLabelPage()
+    }
+
+    private fun initLabels() {
+        if(bundleNoteId != null) {
+            note = Note(
+                noteTitle!!, noteContent!!, bundleDateModified, noteKey, bundleNoteId!!,
+                bundleArchived!!, bundleReminder
+            )
+            noteViewModel.getNoteFromLabel(requireContext(), note!!)
+        }
+
+    }
+
+    private fun goToLabelPage() {
+        binding.labelButton.setOnClickListener {
+            note?.let { it1 -> goToSelectLabelPage(it1) }
+        }
+    }
+
+    private fun goToSelectLabelPage(note: Note) {
+        val labelPage = LabelCreateFragment()
+        val bundle = Bundle()
+        Log.i("NoteLabel","labelList:$labelNoteList")
+        bundle.putInt("mode", LabelCreateFragment.SELECT_MODE)
+        bundle.putSerializable("note", note)
+        bundle.putSerializable("noteLabel", labelNoteList)
+        labelPage.arguments = bundle
+        activity?.run {
+            supportFragmentManager.beginTransaction().replace(R.id.fragment_view, labelPage)
+                .addToBackStack(null).commit()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun reminderNotes() {
-        if(bundleReminder != null) {
+        if (bundleReminder != null) {
             binding.reminderLayout.visibility = View.VISIBLE
             val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
-            val date = formatter.format(bundleReminder)
+            val date = formatter.format(bundleReminder!!)
             binding.reminderTextView.text = date
         }
         binding.reminderButton.setOnClickListener {
@@ -147,24 +194,32 @@ class NoteFragment : Fragment(R.layout.note_page) {
 
             val datePickerDialog = DatePickerDialog(
                 requireContext(), { _, year, month, day ->
-                    TimePickerDialog(requireContext(), { _, hour, minute ->
-                        val selectDateTime = Calendar.getInstance()
-                        selectDateTime.set(year, month, day, hour, minute, 0)
-                        reminder = selectDateTime.time
-                        binding.reminderLayout.visibility = View.VISIBLE
-                        val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
-                        val date = formatter.format(reminder)
-                        binding.reminderTextView.text = date
-                        if(reminder != null) {
-                            val title = binding.titleText.text.toString()
-                            val content = binding.noteText.text.toString()
-                            val note =
-                                Note(title, content, dateModified = bundleDateModified, noteKey,
-                                    bundleNoteId!!, archived = bundleArchived!!, reminder = reminder)
-                            noteViewModel.updateNotes(requireContext(), note, currentUser)
-                            scheduleNotification(note)
-                        }
-                    },
+                    TimePickerDialog(
+                        requireContext(), { _, hour, minute ->
+                            val selectDateTime = Calendar.getInstance()
+                            selectDateTime.set(year, month, day, hour, minute, 0)
+                            reminder = selectDateTime.time
+                            binding.reminderLayout.visibility = View.VISIBLE
+                            val formatter = SimpleDateFormat("dd MMM, hh:mm aa")
+                            val date = formatter.format(reminder)
+                            binding.reminderTextView.text = date
+                            if (reminder != null) {
+                                val title = binding.titleText.text.toString()
+                                val content = binding.noteText.text.toString()
+                                val note =
+                                    Note(
+                                        title,
+                                        content,
+                                        dateModified = bundleDateModified,
+                                        noteKey,
+                                        bundleNoteId!!,
+                                        archived = bundleArchived!!,
+                                        reminder = reminder
+                                    )
+                                noteViewModel.updateNotes(requireContext(), note, currentUser)
+                                scheduleNotification(note)
+                            }
+                        },
                         startHour,
                         startMinute,
                         false
@@ -182,19 +237,19 @@ class NoteFragment : Fragment(R.layout.note_page) {
         binding.reminderLayout.setOnClickListener {
             val alertDialog = AlertDialog.Builder(requireContext())
                 .setMessage("Do you want to delete the reminder?")
-                .setPositiveButton("Yes") {
-                    _, _ ->
+                .setPositiveButton("Yes") { _, _ ->
                     val title = binding.titleText.text.toString()
                     val content = binding.noteText.text.toString()
                     val note =
-                        Note(title, content, dateModified = bundleDateModified, noteKey,
-                            bundleNoteId!!, archived = bundleArchived!!, reminder = null)
+                        Note(
+                            title, content, dateModified = bundleDateModified, noteKey,
+                            bundleNoteId!!, archived = bundleArchived!!, reminder = null
+                        )
                     noteViewModel.updateNotes(requireContext(), note, currentUser)
                     binding.reminderLayout.visibility = View.GONE
                     scheduleNotification(note, cancel = true)
                 }
-                .setNegativeButton("No") {
-                    _, _  ->
+                .setNegativeButton("No") { _, _ ->
                 }.create()
 
             alertDialog.show()
@@ -202,42 +257,56 @@ class NoteFragment : Fragment(R.layout.note_page) {
     }
 
     private fun archiveNotes() {
-        if(bundleArchived == false) {
-            binding.archiveButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(),
-                R.drawable.archive_notepage))
-        }else {
-            binding.archiveButton.setImageDrawable(AppCompatResources.getDrawable(requireContext(),
-                R.drawable.unarchive_notepage))
+        if (bundleArchived == false) {
+            binding.archiveButton.setImageDrawable(
+                AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.archive_notepage
+                )
+            )
+        } else {
+            binding.archiveButton.setImageDrawable(
+                AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.drawable.unarchive_notepage
+                )
+            )
         }
         binding.archiveButton.setOnClickListener {
-            if(bundleArchived == false){
+            if (bundleArchived == false) {
                 val title = binding.titleText.text.toString()
                 val content = binding.noteText.text.toString()
                 val note =
-                    Note(title, content, dateModified = bundleDateModified, noteKey,
-                        bundleNoteId!!, archived = true, reminder = bundleReminder)
+                    Note(
+                        title, content, dateModified = bundleDateModified, noteKey,
+                        bundleNoteId!!, archived = true, reminder = bundleReminder
+                    )
                 noteViewModel.updateNotes(requireContext(), note, currentUser)
 
-            }else if(bundleArchived== true) {
+            } else if (bundleArchived == true) {
                 val title = binding.titleText.text.toString()
                 val content = binding.noteText.text.toString()
                 val note =
-                    Note(title, content, dateModified = bundleDateModified, noteKey,
-                        bundleNoteId!!, archived = false, reminder = bundleReminder)
+                    Note(
+                        title, content, dateModified = bundleDateModified, noteKey,
+                        bundleNoteId!!, archived = false, reminder = bundleReminder
+                    )
                 noteViewModel.updateNotes(requireContext(), note, currentUser)
             }
         }
     }
 
     private fun checkVisibility() {
-        if(bundleNoteId == null){
+        if (bundleNoteId == null) {
             binding.deleteButton.visibility = View.GONE
             binding.archiveButton.visibility = View.GONE
             binding.reminderButton.visibility = View.GONE
-        }else{
+            binding.labelButton.visibility = View.GONE
+        } else {
             binding.deleteButton.visibility = View.VISIBLE
-            binding.archiveButton.visibility =  View.VISIBLE
+            binding.archiveButton.visibility = View.VISIBLE
             binding.reminderButton.visibility = View.VISIBLE
+            binding.labelButton.visibility = View.VISIBLE
         }
     }
 
@@ -280,8 +349,10 @@ class NoteFragment : Fragment(R.layout.note_page) {
             noteViewModel.addNewNote(requireContext(), notes, currentUser)
         } else {
             val note =
-                Note(title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!,
-                bundleArchived!!, bundleReminder)
+                Note(
+                    title, content, dateModified = bundleDateModified, noteKey, bundleNoteId!!,
+                    bundleArchived!!, bundleReminder
+                )
             noteViewModel.updateNotes(requireContext(), note, currentUser)
             Toast.makeText(
                 requireContext(),
@@ -314,16 +385,21 @@ class NoteFragment : Fragment(R.layout.note_page) {
             .putString(REMINDER, DateTypeConverter().fromOffsetDateTime(note.reminder))
             .build()
 
-        if(!cancel) {
+        if (!cancel) {
             val notification = OneTimeWorkRequestBuilder<NotifyWorker>()
-                .setInitialDelay(note.reminder?.time!! - System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .setInitialDelay(
+                    note.reminder?.time!! - System.currentTimeMillis(),
+                    TimeUnit.MILLISECONDS
+                )
                 .setInputData(inputData)
                 .addTag(note.title)
                 .build()
 
-            WorkManager.getInstance(requireContext()).enqueueUniqueWork(note.key,
-                ExistingWorkPolicy.REPLACE, notification)
-        }else {
+            WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+                note.key,
+                ExistingWorkPolicy.REPLACE, notification
+            )
+        } else {
             WorkManager.getInstance(requireContext()).cancelUniqueWork(note.key)
         }
     }

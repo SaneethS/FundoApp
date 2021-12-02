@@ -38,6 +38,9 @@ class SharedViewModel : ViewModel() {
     private val _goToExistNotePageStatus = MutableLiveData<Note>()
     val goToExistNotePageStatus = _goToExistNotePageStatus as LiveData<Note>
 
+    private val _goToSelectLabelPageStatus = MutableLiveData<Note>()
+    val goToSelectLabelPageStatus = _goToSelectLabelPageStatus as LiveData<Note>
+
     fun setGoToHomePageStatus(status: Boolean) {
         _goToHomePageStatus.value = status
     }
@@ -72,6 +75,10 @@ class SharedViewModel : ViewModel() {
 
     fun setGoToExistingNotePage(note: Note){
         _goToExistNotePageStatus.value = note
+    }
+
+    fun setGoToSelectLabelPage(note: Note) {
+        _goToSelectLabelPageStatus.value = note
     }
 
     fun checkUser(): Boolean {
