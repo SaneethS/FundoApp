@@ -45,6 +45,17 @@
         android:tag="archive">
     </ImageView>
 
+    <ImageView
+        android:id="@+id/label_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/back_button"
+        android:layout_marginEnd="10dp"
+        android:layout_toStartOf="@+id/reminder_button"
+        android:src="@drawable/new_label_button"
+        android:tag="archive">
+    </ImageView>
+
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

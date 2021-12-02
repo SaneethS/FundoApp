@@ -7,7 +7,7 @@ import com.google.firebase.messaging.ktx.messaging
 object FirebaseTopicMessaging {
 
     fun setTopicToSubscribe() {
-        Firebase.messaging.subscribeToTopic("general")
+        Firebase.messaging.subscribeToTopic("notes")
             .addOnCompleteListener { task ->
                 var msg = "Success"
                 if (!task.isSuccessful) {

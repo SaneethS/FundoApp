@@ -13,13 +13,22 @@
 
         <ImageView
             android:id="@+id/delete_label_button"
-            android:tag="label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:padding="8dp"
-            android:src="@drawable/label_outlined">
+            android:src="@drawable/label_outlined"
+            android:tag="label">
         </ImageView>
+
+        <CheckBox
+            android:id="@+id/label_check_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/list_label_name"
+            android:visibility="gone">
+        </CheckBox>
 
         <EditText
             android:padding="10dp"

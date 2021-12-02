@@ -1,6 +1,7 @@
 package com.yml.fundo.ui.label
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,6 +29,10 @@ class LabelCreateViewModel : ViewModel() {
 
     private val _updateLabelStatus = MutableLiveData<Label>()
     val updateLabelStatus = _updateLabelStatus as LiveData<Label>
+
+    private val _labelNoteLinkStatus = MutableLiveData<Boolean>()
+    val labelNoteLinkStatus = _labelNoteLinkStatus as LiveData<Boolean>
+
 
     fun addNewLabel(context: Context, label: Label, user: User) {
         viewModelScope.launch {
@@ -85,5 +90,35 @@ class LabelCreateViewModel : ViewModel() {
                 _updateLabelStatus.value = label
             }
         }
+    }
+
+    fun labelNoteLink(context: Context, noteId: String, labels: ArrayList<Label>) {
+        viewModelScope.launch {
+            Log.i("LabelBackStack","labelNoteLink view model called")
+            val userId = SharedPref.getId()
+            val user = DatabaseService.getInstance(context).getUserFromDatabase(userId)
+            val link = user?.let {
+                DatabaseService.getInstance(context).labelNoteAssociation(noteId, labels,
+                    it
+                )
+            }
+            if(link == true) {
+                _labelNoteLinkStatus.value = link
+            }
+        }
+    }
+
+    fun removeLabelNoteLink(context: Context, linkId: String) {
+        viewModelScope.launch {
+            val userId = SharedPref.getId()
+            val user = DatabaseService.getInstance(context).getUserFromDatabase(userId)
+            if (user != null) {
+                DatabaseService.getInstance(context).removeLabelNoteLink(linkId, user)
+            }
+        }
+    }
+
+    fun resetLabelNoteLinkStatus() {
+        _labelNoteLinkStatus.value = null
     }
 }

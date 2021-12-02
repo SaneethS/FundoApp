@@ -12,6 +12,8 @@ import com.yml.fundo.common.*
 import com.yml.fundo.databinding.ActivityMainBinding
 import com.yml.fundo.ui.home.HomeFragment
 import com.yml.fundo.ui.label.LabelCreateFragment
+import com.yml.fundo.ui.label.LabelCreateFragment.Companion.ADD_MODE
+import com.yml.fundo.ui.label.LabelCreateFragment.Companion.SELECT_MODE
 import com.yml.fundo.ui.login.LoginFragment
 import com.yml.fundo.ui.note.NoteFragment
 import com.yml.fundo.ui.register.RegisterFragment
@@ -109,7 +111,10 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel.goToExistNotePageStatus.observe(this@MainActivity) {
             goToExistingNotePage(it)
         }
+
     }
+
+
 
     private fun goToReminderNotePage() {
         val bundle = Bundle()
@@ -164,7 +169,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToLabelCreate() {
-        switchFragment(LabelCreateFragment())
+        val labelPage = LabelCreateFragment()
+        val bundle = Bundle()
+        bundle.putInt("mode",ADD_MODE)
+        labelPage.arguments = bundle
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_view, labelPage).
+        addToBackStack(null).commit()
     }
 
     private fun switchFragment(fragment: Fragment) {
