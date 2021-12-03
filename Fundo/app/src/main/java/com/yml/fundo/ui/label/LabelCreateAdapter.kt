@@ -95,14 +95,13 @@ class LabelCreateAdapter(
 
 
                 checkBox.setOnCheckedChangeListener {  _, isChecked ->
-                    if(isChecked) {
-                        item.isChecked = true
-                    }
+                    item.isChecked = isChecked
                 }
 
                 labelNoteList.forEach {
                     if(it.fid == item.fid) {
                         checkBox.isChecked = true
+                        item.isChecked = true
                     }
                 }
             }
