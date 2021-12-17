@@ -3,6 +3,7 @@ package com.yml.fundo.data.service
 import android.content.Context
 import android.util.Log
 import com.yml.fundo.common.NetworkService
+import com.yml.fundo.networking.users.UserService
 import com.yml.fundo.ui.wrapper.Label
 import com.yml.fundo.ui.wrapper.User
 import com.yml.fundo.ui.wrapper.Note
@@ -22,8 +23,9 @@ class DatabaseService(val context: Context) {
     suspend fun setUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
-                val userFirebase = firebaseDatabase.getUserFromDatabase(user.fUid)
-                val userSql = sqlDb.setUserToDatabase(userFirebase)
+//                val userFirebase = firebaseDatabase.getUserFromDatabase(user.fUid)
+                val userService = UserService().getUser(user.fUid)
+                val userSql = sqlDb.setUserToDatabase(userService)
                 userSql
             } catch (e: Exception) {
                 e.printStackTrace()

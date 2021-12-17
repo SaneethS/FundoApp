@@ -21,9 +21,9 @@ class TestActivity : AppCompatActivity() {
         val textViewApi = findViewById<TextView>(R.id.textView_api_response)
         apiButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
-                val users = userService.getUsers()
+//                val users = userService.getUsers()
                 withContext(Dispatchers.Main) {
-                    textViewApi.text = users.toString()
+//                    textViewApi.text = users.toString()
                 }
             }
         }
