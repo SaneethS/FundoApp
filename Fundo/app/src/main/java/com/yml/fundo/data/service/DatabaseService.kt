@@ -37,8 +37,9 @@ class DatabaseService(val context: Context) {
     suspend fun setNewUserToDatabase(user: User): User? {
         return withContext(Dispatchers.IO) {
             try {
-                val userFirebase = firebaseDatabase.setUserToDatabase(user)
-                val userSql = sqlDb.setUserToDatabase(userFirebase!!)
+//                val userFirebase = firebaseDatabase.setUserToDatabase(user)
+                val userService = UserService().setUser(user)
+                val userSql = sqlDb.setUserToDatabase(userService)
                 userSql
             } catch (e: Exception) {
                 e.printStackTrace()

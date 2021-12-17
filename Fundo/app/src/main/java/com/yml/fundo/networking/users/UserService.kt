@@ -30,4 +30,17 @@ class UserService {
         )
         return user
     }
+
+    suspend fun setUser(user: User): User {
+        val userFields = UserFields(
+            name = StringField(user.name),
+            email = StringField(user.email),
+            mobileNo = StringField(user.mobileNo)
+        )
+        val newUser = NewUser(
+            userFields
+        )
+        usersApi.setUser(user.fUid, newUser)
+        return user
+    }
 }
