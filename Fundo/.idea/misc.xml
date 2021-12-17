@@ -25,6 +25,7 @@
         <entry key="app/src/main/res/drawable/toolbar_layout.xml" value="0.13854166666666667" />
         <entry key="app/src/main/res/drawable/view_selector.xml" value="0.25885416666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.22512820512820514" />
+        <entry key="app/src/main/res/layout/activity_test.xml" value="0.1609375" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.24270833333333333" />
         <entry key="app/src/main/res/layout/date_time_dialog.xml" value="0.24270833333333333" />
         <entry key="app/src/main/res/layout/drawer_header.xml" value="0.24270833333333333" />
